@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* pequeñas utilidades para demo */
+html, body, #__next {
+  height: 100%;
+}
+body {
+  @apply bg-gray-50 text-gray-900;
+}
