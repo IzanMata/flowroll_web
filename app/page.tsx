@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 type Technique = {
   id: number;
@@ -10,10 +10,10 @@ type Technique = {
 };
 
 async function fetchTechniques(): Promise<Technique[]> {
-  const url = (process.env.NEXT_PUBLIC_API_URL ?? "") + "techniques/";
-  const res = await fetch(url, { cache: "no-store" });
+  const url = (process.env.NEXT_PUBLIC_API_URL ?? '') + 'techniques/';
+  const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) {
-    throw new Error("Failed to fetch techniques");
+    throw new Error('Failed to fetch techniques');
   }
   return res.json();
 }
@@ -38,9 +38,11 @@ export default async function Page() {
                 {t.name}
               </Link>
             </h3>
-            <p className="text-sm text-gray-600 mt-1 line-clamp-3">{t.description}</p>
+            <p className="text-sm text-gray-600 mt-1 line-clamp-3">
+              {t.description}
+            </p>
             <div className="mt-3 text-xs text-gray-500">
-              {t.categories?.map((c) => c.name).join(" • ")}
+              {t.categories?.map((c) => c.name).join(' • ')}
             </div>
           </li>
         ))}

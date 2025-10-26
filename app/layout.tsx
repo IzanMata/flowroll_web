@@ -1,9 +1,9 @@
-import "./globals.css";
-import { ReactNode } from "react";
+import './globals.css';
+import { ReactNode } from 'react';
 
 export const metadata = {
-  title: "FlowRoll - Técnicas",
-  description: "Catálogo de técnicas de Jiu Jitsu",
+  title: 'FlowRoll - Técnicas',
+  description: 'Catálogo de técnicas de Jiu Jitsu',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
