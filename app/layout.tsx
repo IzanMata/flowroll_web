@@ -2,8 +2,8 @@ import './globals.css';
 import { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'FlowRoll - Técnicas',
-  description: 'Catálogo de técnicas de Jiu Jitsu',
+  title: 'FlowRoll - Techniques',
+  description: 'Catálogo de Techniques de Jiu Jitsu',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <div className="min-h-screen">
           <header className="bg-white shadow">
             <div className="container mx-auto px-4 py-4">
-              <h1 className="text-xl font-semibold">FlowRoll — Técnicas</h1>
+              <h1 className="text-xl font-semibold">FlowRoll — Techniques</h1>
             </div>
           </header>
           <main className="container mx-auto px-4 py-6">{children}</main>
