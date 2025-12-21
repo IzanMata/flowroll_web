@@ -38,13 +38,13 @@ export const TechniqueCard = ({ technique }: { technique: Technique }) => {
       transition="all 0.2s"
       _hover={{ boxShadow: 'xl', transform: 'translateY(-4px)' }}
     >
-      <Image
+      {/* <Image
         src=""
         alt={technique.name}
         objectFit="cover"
         h="180px"
         w="100%"
-      />
+      /> */}
 
       <CardBody>
         <Flex justify="space-between" align="center" mb={2}>

@@ -1,17 +1,23 @@
-import { TechniqueNode } from '@/features/techniques/components/TechniqueNode';
-import { fetchTechniques } from '@/features/techniques/api/fetchTechniques';
+'use client'
+
+import { fetchTechniques } from '@/features/techniques/api/fetchTechniques'
+import { TechniqueCard } from '@/components/techniques/technique-card'
+import { SimpleGrid, Box, Heading } from '@chakra-ui/react'
 
 export default async function TechniquesPage() {
-  const techniques = await fetchTechniques();
+  const techniques = await fetchTechniques()
 
   return (
-    <main className="p-6">
-      <h1 className="text-3xl font-bold mb-8">Techniques</h1>
-      <div className="flex flex-wrap gap-6">
-        {techniques.map((tech) => (
-          <TechniqueNode key={tech.id} technique={tech} />
+    <Box p={6}>
+      <Heading as="h1" size="2xl" mb={8}>
+        Techniques
+      </Heading>
+
+      <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }}>
+        {techniques.map((technique) => (
+          <TechniqueCard key={technique.id} technique={technique} />
         ))}
-      </div>
-    </main>
-  );
+      </SimpleGrid>
+    </Box>
+  )
 }
