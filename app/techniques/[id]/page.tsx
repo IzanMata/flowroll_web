@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { TechniqueCard } from '@/components/techniques/technique-card';
 
 type Technique = {
   id: number;
@@ -8,7 +8,7 @@ type Technique = {
   min_belt?: { id: number; color: string; order: number } | null;
   categories?: { id: number; name: string }[];
   variations?: { id: number; name: string; description?: string }[];
-  leads_to?: { id: number; to_technique?: string }[]; // depende serializer
+  leads_to?: { id: number; to_technique?: string }[];
 };
 
 async function fetchTechnique(id: string): Promise<Technique | null> {
@@ -19,32 +19,17 @@ async function fetchTechnique(id: string): Promise<Technique | null> {
   return res.json();
 }
 
-export default async function TechniquePage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const technique = await fetchTechnique(params.id);
-  if (!technique) return notFound();
+export default async function TechniquePage({ params, }: { params: Promise<{ id: string }>; }) {
+  
+  const { id } = await params;
+
+  const technique = await fetchTechnique(id);
+
+  if (!technique) {
+    return <h1>Prueba</h1>;  // TODO not found technique page
+  }
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-2">{technique.name}</h2>
-      <div className="mb-4 text-sm text-gray-600">
-        Dificultad: {technique.difficulty}
-      </div>
-      <div className="prose max-w-none">{technique.description}</div>
-
-      <section className="mt-6">
-        <h3 className="font-semibold">Variaciones</h3>
-        <ul className="list-disc pl-6">
-          {technique.variations?.map((v) => (
-            <li key={v.id} className="text-sm">
-              {v.name} — <span className="text-gray-500">{v.description}</span>
-            </li>
-          )) || <li className="text-sm text-gray-500">No hay variaciones</li>}
-        </ul>
-      </section>
-    </div>
+    <TechniqueCard technique={technique} />
   );
 }
