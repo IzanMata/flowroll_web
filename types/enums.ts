@@ -1,0 +1,1 @@
+export type ColorEnum = "white" | "blue" | "purple" | "brown" | "black";

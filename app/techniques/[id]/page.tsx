@@ -19,17 +19,18 @@ async function fetchTechnique(id: string): Promise<Technique | null> {
   return res.json();
 }
 
-export default async function TechniquePage({ params, }: { params: Promise<{ id: string }>; }) {
-  
+export default async function TechniquePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
 
   const technique = await fetchTechnique(id);
 
   if (!technique) {
-    return <h1>Prueba</h1>;  // TODO not found technique page
+    return <h1>Prueba</h1>; // TODO not found technique page
   }
 
-  return (
-    <TechniqueCard technique={technique} />
-  );
+  return <TechniqueCard technique={technique} />;
 }

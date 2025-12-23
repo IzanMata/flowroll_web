@@ -1,7 +1,6 @@
 import Link from 'next/link';
 
 export default async function Page() {
-
   return (
     <div>
       <div className="flex items-center justify-between mb-6">

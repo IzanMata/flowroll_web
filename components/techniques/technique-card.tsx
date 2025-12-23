@@ -1,4 +1,6 @@
-'use client'
+'use client';
+
+import { Technique } from "@/types";
 
 import {
   Card,
@@ -12,18 +14,7 @@ import {
   HStack,
   Box,
   Flex,
-} from '@chakra-ui/react'
-
-type Technique = {
-  id: number
-  name: string
-  description?: string
-  difficulty?: number
-  min_belt?: { id: number; color: string; order: number } | null
-  categories?: { id: number; name: string }[]
-  variations?: { id: number; name: string; description?: string }[]
-  leads_to?: { id: number; to_technique?: string }[]
-}
+} from '@chakra-ui/react';
 
 export const TechniqueCard = ({ technique }: { technique: Technique }) => {
   return (
@@ -112,6 +103,5 @@ export const TechniqueCard = ({ technique }: { technique: Technique }) => {
         </Button>
       </CardFooter>
     </Card.Root>
-
-  )
-}
+  );
+};

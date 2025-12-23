@@ -9,7 +9,7 @@ import {
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
-import { useTechniques } from "@/features/techniques/hooks/useTechniques";
+import { useTechniques } from '@/features/techniques/hooks/useTechniques';
 
 export default function TechniqueFlow() {
   const { data: techniques, loading } = useTechniques();
@@ -36,9 +36,7 @@ export default function TechniqueFlow() {
 
     techniques.forEach((tech) => {
       tech.leads_to.forEach((lead) => {
-        const target = techniques.find(
-          (t) => t.name === lead.to_technique
-        );
+        const target = techniques.find((t) => t.name === lead.to_technique);
 
         if (target) {
           mappedEdges.push({
@@ -56,22 +54,21 @@ export default function TechniqueFlow() {
 
     setNodes(mappedNodes);
     setEdges(mappedEdges);
-
   }, [techniques]);
 
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
-    []
+    [],
   );
 
   const onEdgesChange = useCallback(
     (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    []
+    [],
   );
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
-    []
+    [],
   );
 
   if (loading) return <p>Cargando...</p>;

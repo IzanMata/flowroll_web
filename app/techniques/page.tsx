@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
-import { fetchTechniques } from '@/features/techniques/api/fetchTechniques'
-import { TechniqueCard } from '@/components/techniques/technique-card'
-import { SimpleGrid, Box, Heading } from '@chakra-ui/react'
+import { fetchTechniques } from '@/features/techniques/api/fetchTechniques';
+import { TechniqueCard } from '@/components/techniques/technique-card';
+import { SimpleGrid, Box, Heading } from '@chakra-ui/react';
 
 export default async function TechniquesPage() {
-  const techniques = await fetchTechniques()
+  const techniques = await fetchTechniques();
 
   return (
     <Box p={6}>
@@ -19,5 +19,5 @@ export default async function TechniquesPage() {
         ))}
       </SimpleGrid>
     </Box>
-  )
+  );
 }

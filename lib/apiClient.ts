@@ -5,7 +5,10 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-export async function apiFetch<T>(endpoint: string, options?: object): Promise<T> {
+export async function apiFetch<T>(
+  endpoint: string,
+  options?: object,
+): Promise<T> {
   const response = await api.get(endpoint, options);
   return response.data;
 }
