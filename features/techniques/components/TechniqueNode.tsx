@@ -1,6 +1,6 @@
 'use client';
-import React from 'react';
-import { Technique } from '../types';
+
+import { Technique } from '@/types/technique';
 
 export function TechniqueNode({ technique }: { technique: Technique }) {
   return (

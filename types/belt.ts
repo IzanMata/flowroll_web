@@ -1,19 +1,5 @@
-import { ColorEnum } from "./enums";
+import { components } from "@/types/api";
 
-// --- Entity ---
-export interface Belt {
-    readonly id: number;
-    color: ColorEnum;
-    order: number; // 1=white, 5=black
-}
-
-// --- Requests ---
-export interface BeltRequest {
-    color: ColorEnum;
-    order: number;
-}
-
-export interface PatchedBeltRequest {
-    color?: ColorEnum;
-    order?: number;
-}
+export type Belt = components["schemas"]["Belt"];
+export type BeltRequest = components["schemas"]["BeltRequest"];
+export type PatchedBeltRequest = components["schemas"]["PatchedBeltRequest"];

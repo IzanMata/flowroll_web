@@ -1,23 +1,4 @@
-import { TechniqueCard } from '@/components/techniques/technique-card';
-
-type Technique = {
-  id: number;
-  name: string;
-  description?: string;
-  difficulty?: number;
-  min_belt?: { id: number; color: string; order: number } | null;
-  categories?: { id: number; name: string }[];
-  variations?: { id: number; name: string; description?: string }[];
-  leads_to?: { id: number; to_technique?: string }[];
-};
-
-async function fetchTechnique(id: string): Promise<Technique | null> {
-  const url = (process.env.NEXT_PUBLIC_API_URL ?? '') + `techniques/${id}/`;
-  const res = await fetch(url, { cache: 'no-store' });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error('Failed to fetch technique');
-  return res.json();
-}
+import { fetchTechnique } from '@/features/techniques/api/fetchTechniques';
 
 export default async function TechniquePage({
   params,
@@ -29,8 +10,9 @@ export default async function TechniquePage({
   const technique = await fetchTechnique(id);
 
   if (!technique) {
-    return <h1>Prueba</h1>; // TODO not found technique page
+    return <h1>Not found</h1>; // TODO not found technique page
   }
 
-  return <TechniqueCard technique={technique} />;
+  return <h1>{technique.name}</h1>;
+
 }

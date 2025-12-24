@@ -1,1 +1,3 @@
-export type ColorEnum = "white" | "blue" | "purple" | "brown" | "black";
+import { components } from "@/types/api";
+
+export type ColorEnum = components["schemas"]["ColorEnum"];
