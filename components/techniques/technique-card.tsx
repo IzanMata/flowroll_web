@@ -1,6 +1,6 @@
 'use client';
 
-import { Technique } from "@/types";
+import { Technique } from '@/types';
 
 import {
   Card,

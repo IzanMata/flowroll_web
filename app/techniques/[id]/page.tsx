@@ -14,5 +14,4 @@ export default async function TechniquePage({
   }
 
   return <h1>{technique.name}</h1>;
-
 }
