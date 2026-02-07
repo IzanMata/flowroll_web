@@ -1,5 +1,6 @@
 'use client';
 
+import NextLink from "next/link";
 import { Technique } from '@/types';
 
 import {
@@ -95,12 +96,19 @@ export const TechniqueCard = ({ technique }: { technique: Technique }) => {
       </CardBody>
 
       <CardFooter gap={2}>
-        <Button colorScheme="teal" flex={1}>
-          Learn
-        </Button>
+
+        <NextLink href={`/techniques/${technique.id}`} passHref>
+
+          <Button colorScheme="teal" flex={1}>
+            Learn
+          </Button>
+
+        </NextLink>
+
         <Button variant="outline" flex={1}>
           Añadir a favoritos
         </Button>
+
       </CardFooter>
     </Card.Root>
   );
