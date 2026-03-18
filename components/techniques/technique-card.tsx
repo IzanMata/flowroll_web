@@ -1,115 +1,14 @@
 'use client';
 
-import NextLink from "next/link";
-import { Technique } from '@/types';
-
-import {
-  Card,
-  CardBody,
-  CardFooter,
-  Image,
-  Text,
-  Button,
-  Badge,
-  VStack,
-  HStack,
-  Box,
-  Flex,
-} from '@chakra-ui/react';
+import type { Technique } from '@/types/technique';
 
 export const TechniqueCard = ({ technique }: { technique: Technique }) => {
   return (
-    <Card.Root
-      maxW="sm"
-      borderWidth="1px"
-      borderRadius="lg"
-      borderColor={technique.min_belt ? technique.min_belt.color : 'gray.200'}
-      boxShadow="md"
-      overflow="hidden"
-      m={4}
-      transition="all 0.2s"
-      _hover={{ boxShadow: 'xl', transform: 'translateY(-4px)' }}
-    >
-      {/* <Image
-        src=""
-        alt={technique.name}
-        objectFit="cover"
-        h="180px"
-        w="100%"
-      /> */}
-
-      <CardBody>
-        <Flex justify="space-between" align="center" mb={2}>
-          <Text fontSize="xl" fontWeight="bold">
-            {technique.name}
-          </Text>
-          {technique.difficulty && (
-            <Badge colorScheme="red">{`Dificultad: ${technique.difficulty}`}</Badge>
-          )}
-        </Flex>
-
-        {technique.min_belt && (
-          <Badge colorScheme="teal" mb={2}>
-            Belt: {technique.min_belt.color}
-          </Badge>
-        )}
-
-        {technique.categories && technique.categories.length > 0 && (
-          <HStack mb={2} wrap="wrap">
-            {technique.categories.map((c) => (
-              <Badge key={c.id} colorScheme="blue">
-                {c.name}
-              </Badge>
-            ))}
-          </HStack>
-        )}
-
-        {technique.description && (
-          <Text fontSize="sm" color="gray.600" mb={2}>
-            {technique.description}
-          </Text>
-        )}
-
-        <Box borderBottom="1px solid" borderColor="gray.200" my={2} />
-
-        {technique.variations && technique.variations.length > 0 && (
-          <VStack align="start" mb={2}>
-            <Text fontWeight="semibold">Variaciones:</Text>
-            {technique.variations.map((v) => (
-              <Text key={v.id} fontSize="sm">
-                • {v.name} {v.description && `- ${v.description}`}
-              </Text>
-            ))}
-          </VStack>
-        )}
-
-        {technique.leads_to && technique.leads_to.length > 0 && (
-          <VStack align="start" mb={2}>
-            <Text fontWeight="semibold">Conduce a:</Text>
-            {technique.leads_to.map((l, i) => (
-              <Text key={i} fontSize="sm">
-                • {l.to_technique || 'Desconocido'}
-              </Text>
-            ))}
-          </VStack>
-        )}
-      </CardBody>
-
-      <CardFooter gap={2}>
-
-        <NextLink href={`/techniques/${technique.id}`} passHref>
-
-          <Button colorScheme="teal" flex={1}>
-            Learn
-          </Button>
-
-        </NextLink>
-
-        <Button variant="outline" flex={1}>
-          Añadir a favoritos
-        </Button>
-
-      </CardFooter>
-    </Card.Root>
+    <div className="rounded-[6px] border border-white/10 bg-card p-4">
+      <p className="text-sm font-medium text-foreground">{technique.name}</p>
+      {technique.description && (
+        <p className="mt-1 text-xs text-muted-foreground">{technique.description}</p>
+      )}
+    </div>
   );
 };

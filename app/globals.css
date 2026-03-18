@@ -2,12 +2,85 @@
 @tailwind components;
 @tailwind utilities;
 
-/* pequeñas utilidades para demo */
-html,
-body,
-#__next {
-  height: 100%;
+@layer base {
+  :root {
+    /* FlowRoll Dark Theme — always dark, Vercel/Linear aesthetic */
+    --background: 0 0% 4%;           /* #0a0a0a */
+    --foreground: 0 0% 93%;          /* #ededed */
+
+    --card: 0 0% 7%;                 /* #111111 */
+    --card-foreground: 0 0% 93%;
+
+    --popover: 0 0% 10%;             /* #1a1a1a */
+    --popover-foreground: 0 0% 93%;
+
+    /* Primary = electric blue */
+    --primary: 217 91% 60%;          /* #3b82f6 */
+    --primary-foreground: 0 0% 98%;
+
+    /* Secondary = surface */
+    --secondary: 0 0% 10%;           /* #1a1a1a */
+    --secondary-foreground: 0 0% 80%;
+
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 55%;
+
+    /* Accent = same blue used sparingly */
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 63% 55%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 100% / 0.08;      /* subtle white border */
+    --input: 0 0% 100% / 0.06;
+    --ring: 217 91% 60%;
+
+    --radius: 6px;
+  }
+
+  /* Force dark mode globally */
+  html {
+    color-scheme: dark;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
 }
-body {
-  @apply bg-gray-50 text-gray-900;
+
+@layer utilities {
+  /* Subtle card border used throughout */
+  .card-border {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+
+  /* Belt colors */
+  .belt-white  { @apply bg-white text-black; }
+  .belt-blue   { @apply bg-blue-600 text-white; }
+  .belt-purple { @apply bg-purple-600 text-white; }
+  .belt-brown  { @apply bg-amber-900 text-white; }
+  .belt-black  { @apply bg-neutral-900 text-white border border-white/10; }
 }

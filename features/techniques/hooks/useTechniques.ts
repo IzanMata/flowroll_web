@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Technique } from '../types';
+import { Technique } from '@/types/technique';
 import { fetchTechniques } from '../api/fetchTechniques';
 
 export function useTechniques() {

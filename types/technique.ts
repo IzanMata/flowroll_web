@@ -1,19 +1,67 @@
-import { components } from '@/types/api';
+// Legacy technique types from the techniques API
+import type { Belt } from './belt';
 
-export type Technique = components['schemas']['Technique'];
-export type TechniqueCategory = components['schemas']['TechniqueCategory'];
-export type TechniqueVariation = components['schemas']['TechniqueVariation'];
-export type TechniqueFlow = components['schemas']['TechniqueFlow'];
-export type TechniqueRequest = components['schemas']['TechniqueRequest'];
-export type PatchedTechniqueRequest =
-  components['schemas']['PatchedTechniqueRequest'];
-export type TechniqueCategoryRequest =
-  components['schemas']['TechniqueCategoryRequest'];
-export type PatchedTechniqueCategoryRequest =
-  components['schemas']['PatchedTechniqueCategoryRequest'];
-export type TechniqueVariationRequest =
-  components['schemas']['TechniqueVariationRequest'];
-export type PatchedTechniqueVariationRequest =
-  components['schemas']['PatchedTechniqueVariationRequest'];
-export type TechniqueFlowRequest =
-  components['schemas']['TechniqueFlowRequest'];
+export interface TechniqueCategory {
+  readonly id: number;
+  name: string;
+  description?: string;
+}
+
+export interface TechniqueVariation {
+  readonly id: number;
+  name: string;
+  description?: string;
+}
+
+export interface TechniqueFlow {
+  readonly id: number;
+  readonly to_technique: string;
+  description?: string;
+}
+
+export interface Technique {
+  readonly id: number;
+  name: string;
+  description?: string;
+  difficulty?: number;
+  readonly min_belt: Belt;
+  readonly categories: TechniqueCategory[];
+  readonly variations: TechniqueVariation[];
+  readonly leads_to: TechniqueFlow[];
+}
+
+export interface TechniqueRequest {
+  name: string;
+  description?: string;
+  difficulty?: number;
+}
+
+export interface PatchedTechniqueRequest {
+  name?: string;
+  description?: string;
+  difficulty?: number;
+}
+
+export interface TechniqueCategoryRequest {
+  name: string;
+  description?: string;
+}
+
+export interface PatchedTechniqueCategoryRequest {
+  name?: string;
+  description?: string;
+}
+
+export interface TechniqueVariationRequest {
+  name: string;
+  description?: string;
+}
+
+export interface PatchedTechniqueVariationRequest {
+  name?: string;
+  description?: string;
+}
+
+export interface TechniqueFlowRequest {
+  description?: string;
+}
