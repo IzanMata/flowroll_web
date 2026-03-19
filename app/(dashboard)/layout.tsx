@@ -21,10 +21,14 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="space-y-3 w-64">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-glow-blue-sm">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+          </div>
+          <div className="space-y-2 text-center">
+            <Skeleton className="mx-auto h-3 w-32" />
+            <Skeleton className="mx-auto h-3 w-24" />
+          </div>
         </div>
       </div>
     );

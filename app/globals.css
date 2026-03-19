@@ -4,42 +4,41 @@
 
 @layer base {
   :root {
-    /* FlowRoll Dark Theme — always dark, Vercel/Linear aesthetic */
+    /* FlowRoll Dark Theme — premium dark aesthetic */
     --background: 0 0% 4%;           /* #0a0a0a */
     --foreground: 0 0% 93%;          /* #ededed */
 
-    --card: 0 0% 7%;                 /* #111111 */
+    --card: 0 0% 6%;                 /* #0f0f0f — slightly lighter card */
     --card-foreground: 0 0% 93%;
 
-    --popover: 0 0% 10%;             /* #1a1a1a */
+    --popover: 0 0% 9%;              /* #171717 */
     --popover-foreground: 0 0% 93%;
 
     /* Primary = electric blue */
     --primary: 217 91% 60%;          /* #3b82f6 */
     --primary-foreground: 0 0% 98%;
 
-    /* Secondary = surface */
-    --secondary: 0 0% 10%;           /* #1a1a1a */
+    /* Secondary = elevated surface */
+    --secondary: 0 0% 10%;
     --secondary-foreground: 0 0% 80%;
 
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 55%;
+    --muted: 0 0% 11%;
+    --muted-foreground: 0 0% 48%;
 
-    /* Accent = same blue used sparingly */
+    /* Accent = blue used sparingly */
     --accent: 217 91% 60%;
     --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 63% 55%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 100% / 0.08;      /* subtle white border */
+    --border: 0 0% 100% / 0.07;
     --input: 0 0% 100% / 0.06;
     --ring: 217 91% 60%;
 
-    --radius: 6px;
+    --radius: 8px;
   }
 
-  /* Force dark mode globally */
   html {
     color-scheme: dark;
   }
@@ -54,27 +53,48 @@
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
 
-  /* Scrollbar styling */
+  /* Scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 100px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.14);
   }
 }
 
 @layer utilities {
-  /* Subtle card border used throughout */
+  /* Card border */
   .card-border {
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+
+  /* Glow effects */
+  .glow-blue {
+    box-shadow: 0 0 24px rgba(59, 130, 246, 0.4);
+  }
+  .glow-blue-sm {
+    box-shadow: 0 0 14px rgba(59, 130, 246, 0.25);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent;
+  }
+
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fade-in 0.25s ease-out both;
+  }
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out both;
   }
 
   /* Belt colors */
@@ -83,4 +103,19 @@
   .belt-purple { @apply bg-purple-600 text-white; }
   .belt-brown  { @apply bg-amber-900 text-white; }
   .belt-black  { @apply bg-neutral-900 text-white border border-white/10; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position: 200% 0; }
 }

@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  BarChart3,
   BookOpen,
   CalendarDays,
   CreditCard,
@@ -13,6 +12,7 @@ import {
   Swords,
   Timer,
   Users,
+  Zap,
 } from 'lucide-react';
 import { AcademySelector } from './AcademySelector';
 import { cn } from '@/lib/utils';
@@ -32,11 +32,12 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 flex w-[240px] flex-col border-r border-white/[0.06] bg-[#111111]">
+    <aside className="fixed inset-y-0 left-0 z-30 flex w-[240px] flex-col border-r border-white/[0.05] bg-[#080808]">
       {/* Logo */}
-      <div className="flex h-14 items-center gap-2.5 border-b border-white/[0.06] px-4">
-        <div className="flex h-7 w-7 items-center justify-center rounded-[6px] bg-primary">
-          <Shield className="h-4 w-4 text-white" />
+      <div className="flex h-14 items-center gap-3 border-b border-white/[0.05] px-4">
+        <div className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-glow-blue-sm">
+          <Shield className="h-3.5 w-3.5 text-white" />
+          <div className="absolute inset-0 rounded-xl ring-1 ring-white/20" />
         </div>
         <span className="text-sm font-semibold tracking-tight text-foreground">
           FlowRoll
@@ -44,12 +45,12 @@ export function Sidebar() {
       </div>
 
       {/* Academy selector */}
-      <div className="border-b border-white/[0.06] px-3 py-3">
+      <div className="border-b border-white/[0.05] px-3 py-3">
         <AcademySelector />
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-2 py-3">
+      <nav className="flex-1 overflow-y-auto px-2 py-4">
         <ul className="space-y-0.5">
           {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
             const isActive =
@@ -59,21 +60,24 @@ export function Sidebar() {
                 <Link
                   href={href}
                   className={cn(
-                    'group flex h-8 items-center gap-2.5 rounded-[6px] px-2.5 text-sm transition-colors',
+                    'group relative flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm transition-all duration-200',
                     isActive
-                      ? 'bg-primary/10 font-medium text-primary'
-                      : 'text-muted-foreground hover:bg-white/5 hover:text-foreground',
+                      ? 'bg-blue-500/[0.1] font-medium text-blue-400'
+                      : 'text-muted-foreground hover:bg-white/[0.04] hover:text-foreground',
                   )}
                 >
+                  {isActive && (
+                    <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-blue-500" />
+                  )}
                   <Icon
                     className={cn(
-                      'h-4 w-4 shrink-0',
+                      'h-4 w-4 shrink-0 transition-colors duration-200',
                       isActive
-                        ? 'text-primary'
-                        : 'text-muted-foreground group-hover:text-foreground',
+                        ? 'text-blue-400'
+                        : 'text-muted-foreground/60 group-hover:text-foreground',
                     )}
                   />
-                  {label}
+                  <span className="truncate">{label}</span>
                 </Link>
               </li>
             );
@@ -82,9 +86,9 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-white/[0.06] px-3 py-3">
-        <div className="flex items-center gap-2 px-1">
-          <BarChart3 className="h-3.5 w-3.5 text-muted-foreground" />
+      <div className="border-t border-white/[0.05] px-4 py-3">
+        <div className="flex items-center gap-2">
+          <Zap className="h-3 w-3 text-emerald-500" />
           <span className="text-xs text-muted-foreground">v0.1.0</span>
         </div>
       </div>

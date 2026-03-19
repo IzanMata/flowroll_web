@@ -47,80 +47,117 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full max-w-[360px] space-y-8 px-4">
-      {/* Logo */}
-      <div className="flex flex-col items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-[6px] bg-primary shadow-[0_0_24px_rgba(59,130,246,0.3)]">
-          <Shield className="h-6 w-6 text-white" />
-        </div>
-        <div className="text-center">
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            FlowRoll
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Accede a tu academia
-          </p>
-        </div>
+    <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#080808]">
+      {/* Ambient background glow */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600/[0.05] blur-[100px]" />
+        <div className="absolute bottom-0 left-0 h-[400px] w-[400px] -translate-x-1/2 translate-y-1/2 rounded-full bg-blue-900/[0.07] blur-[80px]" />
       </div>
 
-      {/* Form card */}
-      <div className="rounded-[6px] bg-card p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.06)]">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="username">Usuario</Label>
-            <Input
-              id="username"
-              type="text"
-              placeholder="tu_usuario"
-              autoComplete="username"
-              autoFocus
-              {...register('username')}
-            />
-            {errors.username && (
-              <p className="text-xs text-destructive">
-                {errors.username.message}
-              </p>
-            )}
-          </div>
+      {/* Subtle dot grid */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.018]"
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }}
+      />
 
-          <div className="space-y-1.5">
-            <Label htmlFor="password">Contraseña</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="current-password"
-              {...register('password')}
-            />
-            {errors.password && (
-              <p className="text-xs text-destructive">
-                {errors.password.message}
-              </p>
-            )}
+      {/* Form container */}
+      <div className="relative w-full max-w-[360px] animate-slide-up px-5">
+        {/* Logo + heading */}
+        <div className="mb-8 flex flex-col items-center gap-4">
+          <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-glow-blue">
+            <Shield className="h-7 w-7 text-white" />
+            <div className="absolute inset-0 rounded-2xl ring-1 ring-white/20" />
           </div>
+          <div className="text-center">
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">
+              FlowRoll
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Accede a tu academia
+            </p>
+          </div>
+        </div>
 
-          {apiError && (
-            <div className="rounded-[4px] border border-destructive/30 bg-destructive/10 px-3 py-2">
-              <p className="text-xs text-destructive">{apiError}</p>
+        {/* Card */}
+        <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-7 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-sm">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Username */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="username"
+                className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
+              >
+                Usuario
+              </Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="tu_usuario"
+                autoComplete="username"
+                autoFocus
+                {...register('username')}
+              />
+              {errors.username && (
+                <p className="text-xs text-destructive">
+                  {errors.username.message}
+                </p>
+              )}
             </div>
-          )}
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Iniciando sesión…
-              </>
-            ) : (
-              'Iniciar sesión'
+            {/* Password */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="password"
+                className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
+              >
+                Contraseña
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="current-password"
+                {...register('password')}
+              />
+              {errors.password && (
+                <p className="text-xs text-destructive">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            {/* API error */}
+            {apiError && (
+              <div className="rounded-lg border border-red-500/20 bg-red-500/[0.07] px-4 py-3">
+                <p className="text-sm text-red-400">{apiError}</p>
+              </div>
             )}
-          </Button>
-        </form>
-      </div>
 
-      <p className="text-center text-xs text-muted-foreground">
-        FlowRoll &copy; {new Date().getFullYear()}
-      </p>
+            <Button
+              type="submit"
+              className="mt-1 w-full"
+              size="lg"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Iniciando sesión…
+                </>
+              ) : (
+                'Iniciar sesión'
+              )}
+            </Button>
+          </form>
+        </div>
+
+        <p className="mt-6 text-center text-xs text-muted-foreground/50">
+          FlowRoll &copy; {new Date().getFullYear()}
+        </p>
+      </div>
     </div>
   );
 }
