@@ -11,16 +11,9 @@ vi.mock('next/navigation', () => ({
 vi.mock('@/lib/api/client', () => ({
   default: {
     post: vi.fn(),
-    get: vi.fn(),
+    get: vi.fn(() => Promise.reject(new Error('Not authenticated'))),
     interceptors: { request: { use: vi.fn() }, response: { use: vi.fn() } },
   },
-}));
-
-vi.mock('@/lib/auth/tokens', () => ({
-  getAccessToken: vi.fn(() => null),
-  hasTokens: vi.fn(() => false),
-  setTokens: vi.fn(),
-  clearTokens: vi.fn(),
 }));
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (

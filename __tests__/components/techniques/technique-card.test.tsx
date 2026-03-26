@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { TechniqueCard } from '@/components/techniques/technique-card';
-import type { Technique } from '@/types/technique';
+import type { Technique } from '@/types/api';
 
 const baseTechnique: Technique = {
   id: 1,
   name: 'Armbar',
   description: 'A joint lock on the elbow',
   difficulty: 3,
-  min_belt: { id: 1, color: 'white', order: 1 },
+  min_belt: { id: 1, color: 'WHITE', stripes: 0 },
   categories: [],
   variations: [],
   leads_to: [],

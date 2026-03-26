@@ -35,13 +35,10 @@ export default function LoginPage() {
     try {
       await login(values);
     } catch (err) {
-      if (isAxiosError(err)) {
-        const detail = err.response?.data?.detail as string | undefined;
-        setApiError(
-          detail ?? 'Credenciales incorrectas. Inténtalo de nuevo.',
-        );
+      if (isAxiosError(err) && err.response?.status === 500) {
+        setApiError('Error del servidor. Inténtalo de nuevo más tarde.');
       } else {
-        setApiError('Error inesperado. Inténtalo de nuevo.');
+        setApiError('Credenciales incorrectas. Inténtalo de nuevo.');
       }
     }
   }

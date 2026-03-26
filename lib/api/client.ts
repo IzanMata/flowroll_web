@@ -1,37 +1,16 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import {
-  clearTokens,
-  getAccessToken,
-  getRefreshToken,
-  setAccessToken,
-} from '@/lib/auth/tokens';
 import { ENDPOINTS } from './endpoints';
-import type { TokenPair } from '@/types/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Axios instance
+// Axios instance — same-origin requests; the middleware + rewrite layer in
+// Next.js proxies /api/* to the Django backend and injects the Authorization
+// header from the httpOnly auth cookie.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000',
   headers: { 'Content-Type': 'application/json' },
   timeout: 15_000,
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Request interceptor — attach Bearer token
-// ─────────────────────────────────────────────────────────────────────────────
-
-apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = getAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error: unknown) => Promise.reject(error),
-);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Response interceptor — transparent token refresh on 401
@@ -39,14 +18,14 @@ apiClient.interceptors.request.use(
 
 let isRefreshing = false;
 let failedQueue: Array<{
-  resolve: (token: string) => void;
+  resolve: () => void;
   reject: (err: unknown) => void;
 }> = [];
 
-function processQueue(error: unknown, token: string | null = null): void {
+function processQueue(error: unknown): void {
   failedQueue.forEach(({ resolve, reject }) => {
     if (error) reject(error);
-    else resolve(token!);
+    else resolve();
   });
   failedQueue = [];
 }
@@ -65,7 +44,6 @@ apiClient.interceptors.response.use(
 
     // If 401 on the refresh endpoint itself → session is dead
     if (is401 && isRefreshEndpoint) {
-      clearTokens();
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }
@@ -76,43 +54,23 @@ apiClient.interceptors.response.use(
     if (is401 && !originalRequest._retry) {
       if (isRefreshing) {
         // Queue this request until refresh completes
-        return new Promise<string>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
-          .then((newToken) => {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            return apiClient(originalRequest);
-          })
+          .then(() => apiClient(originalRequest))
           .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = getRefreshToken();
-
-      if (!refreshToken) {
-        clearTokens();
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
-        }
-        return Promise.reject(error);
-      }
-
       try {
-        const { data } = await axios.post<TokenPair>(
-          `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'}${ENDPOINTS.AUTH.REFRESH}`,
-          { refresh: refreshToken },
-        );
-
-        setAccessToken(data.access);
-        processQueue(null, data.access);
-
-        originalRequest.headers.Authorization = `Bearer ${data.access}`;
+        // Call the BFF refresh endpoint — cookies are updated server-side
+        await axios.post(ENDPOINTS.AUTH.REFRESH);
+        processQueue(null);
         return apiClient(originalRequest);
       } catch (refreshError) {
-        processQueue(refreshError, null);
-        clearTokens();
+        processQueue(refreshError);
         if (typeof window !== 'undefined') {
           window.location.href = '/login';
         }
@@ -125,5 +83,17 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Convenience wrapper for GET requests (replaces legacy lib/apiClient.ts)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function apiFetch<T>(
+  endpoint: string,
+  options?: object,
+): Promise<T> {
+  const response = await apiClient.get(`/api/${endpoint}`, options);
+  return response.data;
+}
 
 export default apiClient;

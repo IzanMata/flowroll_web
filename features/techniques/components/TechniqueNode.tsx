@@ -1,6 +1,6 @@
 'use client';
 
-import { Technique } from '@/types/technique';
+import type { Technique } from '@/types/api';
 
 export function TechniqueNode({ technique }: { technique: Technique }) {
   return (

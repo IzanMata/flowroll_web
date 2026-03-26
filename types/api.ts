@@ -247,16 +247,84 @@ export interface Seminar {
   registered_count: number;
 }
 
+// Belt mutation requests
+export interface BeltRequest {
+  color: BeltColor;
+  stripes: number;
+}
+
+export interface PatchedBeltRequest {
+  color?: BeltColor;
+  stripes?: number;
+}
+
+// Technique categories (platform library)
+export interface TechniqueCategory {
+  id: number;
+  name: string;
+  description?: string;
+}
+
+export interface TechniqueVariation {
+  id: number;
+  name: string;
+  description?: string;
+}
+
+export interface TechniqueFlow {
+  id: number;
+  to_technique: string;
+  description?: string;
+}
+
 // Techniques (platform library)
 export interface Technique {
   id: number;
   name: string;
   description?: string;
-  category: string;
-  difficulty: 1 | 2 | 3 | 4 | 5;
-  min_belt?: BeltColor;
+  difficulty?: 1 | 2 | 3 | 4 | 5;
+  min_belt?: Belt;
+  categories: TechniqueCategory[];
+  variations: TechniqueVariation[];
+  leads_to: TechniqueFlow[];
   video_url?: string;
-  tags: string[];
+  tags?: string[];
+}
+
+export interface TechniqueRequest {
+  name: string;
+  description?: string;
+  difficulty?: number;
+}
+
+export interface PatchedTechniqueRequest {
+  name?: string;
+  description?: string;
+  difficulty?: number;
+}
+
+export interface TechniqueCategoryRequest {
+  name: string;
+  description?: string;
+}
+
+export interface PatchedTechniqueCategoryRequest {
+  name?: string;
+  description?: string;
+}
+
+export interface TechniqueVariationRequest {
+  name: string;
+  description?: string;
+}
+
+export interface PatchedTechniqueVariationRequest {
+  name?: string;
+  description?: string;
+}
+
+export interface TechniqueFlowRequest {
+  description?: string;
 }
 
 // Learning (athlete diary)

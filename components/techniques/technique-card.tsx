@@ -1,6 +1,6 @@
 'use client';
 
-import type { Technique } from '@/types/technique';
+import type { Technique } from '@/types/api';
 
 export const TechniqueCard = ({ technique }: { technique: Technique }) => {
   return (
