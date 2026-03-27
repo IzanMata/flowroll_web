@@ -12,8 +12,15 @@ import { Label } from '@/components/ui/label';
 import { isAxiosError } from 'axios';
 
 const loginSchema = z.object({
-  username: z.string().min(1, 'El usuario es obligatorio'),
-  password: z.string().min(1, 'La contraseña es obligatoria'),
+  username: z
+    .string()
+    .trim()
+    .min(1, 'El usuario es obligatorio')
+    .max(150, 'El usuario no puede superar 150 caracteres'),
+  password: z
+    .string()
+    .min(1, 'La contraseña es obligatoria')
+    .max(128, 'La contraseña no puede superar 128 caracteres'),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;

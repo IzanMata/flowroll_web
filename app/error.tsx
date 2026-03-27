@@ -12,7 +12,12 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(error);
+    } else if (error.digest) {
+      // In production only log the opaque digest (no stack traces exposed).
+      console.error('Error digest:', error.digest);
+    }
   }, [error]);
 
   return (

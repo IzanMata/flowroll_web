@@ -1,17 +1,25 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import {
   clearAuthCookies,
   getBackendUrl,
   getRefreshToken,
   setAuthCookies,
 } from '@/lib/api/cookies';
+import { validateCsrfOrigin } from '@/lib/api/csrf';
 
 /**
  * POST /api/auth/token/refresh/
  * BFF token refresh — reads refresh token from httpOnly cookie,
  * calls Django, and updates cookies.
  */
-export async function POST() {
+export async function POST(request: NextRequest) {
+  if (!validateCsrfOrigin(request)) {
+    return NextResponse.json(
+      { detail: 'Solicitud no permitida.' },
+      { status: 403 },
+    );
+  }
+
   const refreshToken = await getRefreshToken();
 
   if (!refreshToken) {

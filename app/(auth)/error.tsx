@@ -12,7 +12,11 @@ export default function AuthError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(error);
+    } else if (error.digest) {
+      console.error('Error digest:', error.digest);
+    }
   }, [error]);
 
   return (

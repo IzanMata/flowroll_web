@@ -1,6 +1,15 @@
 import { cookies } from 'next/headers';
 
-const BACKEND_URL = process.env.BACKEND_URL ?? 'http://127.0.0.1:8000';
+const BACKEND_URL = (() => {
+  const url = process.env.BACKEND_URL ?? 'http://127.0.0.1:8000';
+  if (process.env.NODE_ENV === 'production' && !process.env.BACKEND_URL) {
+    throw new Error(
+      'BACKEND_URL environment variable is required in production. ' +
+        'Set it to the Django backend base URL (e.g. https://api.flowroll.app).',
+    );
+  }
+  return url;
+})();
 
 const COOKIE_DEFAULTS = {
   httpOnly: true,

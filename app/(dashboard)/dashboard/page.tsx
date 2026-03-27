@@ -13,10 +13,12 @@ import { useAcademyId } from '@/hooks/useAcademy';
 import { useAuth } from '@/hooks/useAuth';
 import apiClient from '@/lib/api/client';
 import { ENDPOINTS } from '@/lib/api/endpoints';
-import type { PaginatedResponse, TrainingClass } from '@/types/api';
+import { formatDateTime, getGreeting, isToday, isUpcoming } from '@/lib/utils/date';
+import { getCapacityColor } from '@/lib/utils/capacity';
+import { CLASS_TYPE_CONFIG } from '@/lib/utils/class-type';
+import type { ClassType, PaginatedResponse, TrainingClass } from '@/types/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { cn } from '@/lib/utils';
 
@@ -71,36 +73,10 @@ function StatCard({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Class type badge colors
+// Class type badge
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CLASS_TYPE_CONFIG: Record<
-  string,
-  { label: string; className: string }
-> = {
-  GI: {
-    label: 'Gi',
-    className: 'border-blue-500/30 bg-blue-500/10 text-blue-400',
-  },
-  NOGI: {
-    label: 'NoGi',
-    className: 'border-purple-500/30 bg-purple-500/10 text-purple-400',
-  },
-  KIDS: {
-    label: 'Kids',
-    className: 'border-amber-500/30 bg-amber-500/10 text-amber-400',
-  },
-  COMPETITION: {
-    label: 'Competición',
-    className: 'border-red-500/30 bg-red-500/10 text-red-400',
-  },
-  OPEN_MAT: {
-    label: 'Open Mat',
-    className: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400',
-  },
-};
-
-function ClassTypeBadge({ type }: { type: string }) {
+function ClassTypeBadge({ type }: { type: ClassType }) {
   const config = CLASS_TYPE_CONFIG[type] ?? {
     label: type,
     className: 'border-white/10 text-muted-foreground',
@@ -118,51 +94,11 @@ function ClassTypeBadge({ type }: { type: string }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Helpers
+// Dashboard page — fetches the next 10 upcoming classes
 // ─────────────────────────────────────────────────────────────────────────────
 
-function formatDateTime(iso: string): string {
-  return new Intl.DateTimeFormat('es-ES', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(iso));
-}
-
-function isUpcoming(scheduledAt: string): boolean {
-  return new Date(scheduledAt) > new Date();
-}
-
-function isToday(scheduledAt: string): boolean {
-  const d = new Date(scheduledAt);
-  const today = new Date();
-  return (
-    d.getFullYear() === today.getFullYear() &&
-    d.getMonth() === today.getMonth() &&
-    d.getDate() === today.getDate()
-  );
-}
-
-function getGreeting(): string {
-  const h = new Date().getHours();
-  if (h < 13) return 'Buenos días';
-  if (h < 20) return 'Buenas tardes';
-  return 'Buenas noches';
-}
-
-function getCapacityColor(count: number, max: number): string {
-  if (max === 0) return 'text-muted-foreground';
-  const ratio = count / max;
-  if (ratio >= 0.9) return 'text-red-400';
-  if (ratio >= 0.7) return 'text-amber-400';
-  return 'text-emerald-400';
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Dashboard page
-// ─────────────────────────────────────────────────────────────────────────────
+const UPCOMING_DISPLAY_LIMIT = 8;
+const FETCH_PAGE_SIZE = 10;
 
 export default function DashboardPage() {
   const academyId = useAcademyId();
@@ -179,7 +115,7 @@ export default function DashboardPage() {
           params: {
             academy: academyId,
             ordering: 'scheduled_at',
-            page_size: 50,
+            page_size: FETCH_PAGE_SIZE,
           },
         },
       );
@@ -278,65 +214,55 @@ export default function DashboardPage() {
           />
         ) : (
           <div className="space-y-2">
-            {upcomingClasses.slice(0, 8).map((cls, i) => (
-              <div
-                key={cls.id}
-                className="group flex items-center gap-4 rounded-xl border border-white/[0.06] bg-card px-4 py-3.5 transition-all duration-200 hover:border-white/[0.1] hover:bg-white/[0.03] animate-slide-up"
-                style={{ animationDelay: `${i * 40}ms` }}
-              >
-                {/* Left accent bar based on class type */}
+            {upcomingClasses.slice(0, UPCOMING_DISPLAY_LIMIT).map((cls, i) => {
+              const accentClass =
+                CLASS_TYPE_CONFIG[cls.class_type]?.accentClass ?? 'bg-white/20';
+              return (
                 <div
-                  className={cn(
-                    'h-8 w-1 shrink-0 rounded-full',
-                    cls.class_type === 'GI' && 'bg-blue-500',
-                    cls.class_type === 'NOGI' && 'bg-purple-500',
-                    cls.class_type === 'KIDS' && 'bg-amber-500',
-                    cls.class_type === 'COMPETITION' && 'bg-red-500',
-                    cls.class_type === 'OPEN_MAT' && 'bg-emerald-500',
-                    !['GI','NOGI','KIDS','COMPETITION','OPEN_MAT'].includes(cls.class_type) && 'bg-white/20',
-                  )}
-                />
+                  key={cls.id}
+                  className="group flex items-center gap-4 rounded-xl border border-white/[0.06] bg-card px-4 py-3.5 transition-all duration-200 hover:border-white/[0.1] hover:bg-white/[0.03] animate-slide-up"
+                  style={{ '--slide-delay': `${i * 40}ms` } as React.CSSProperties}
+                >
+                  <div className={cn('h-8 w-1 shrink-0 rounded-full', accentClass)} />
 
-                <div className="min-w-0 flex-1 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="truncate text-sm font-medium text-foreground">
-                      {cls.title}
-                    </span>
-                    <ClassTypeBadge type={cls.class_type} />
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="truncate text-sm font-medium text-foreground">
+                        {cls.title}
+                      </span>
+                      <ClassTypeBadge type={cls.class_type} />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDateTime(cls.scheduled_at)}
+                      {' · '}
+                      {cls.duration_minutes} min
+                      {cls.professor_username && (
+                        <> · {cls.professor_username}</>
+                      )}
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {formatDateTime(cls.scheduled_at)}
-                    {' · '}
-                    {cls.duration_minutes} min
-                    {cls.professor_username && (
-                      <> · {cls.professor_username}</>
-                    )}
-                  </p>
-                </div>
 
-                <div className="flex shrink-0 flex-col items-end gap-0.5">
-                  <span
-                    className={cn(
-                      'font-mono text-sm font-medium',
-                      getCapacityColor(
-                        cls.attendance_count,
-                        cls.max_capacity,
-                      ),
-                    )}
-                  >
-                    {cls.attendance_count}
-                    <span className="font-normal text-muted-foreground">
-                      /{cls.max_capacity}
+                  <div className="flex shrink-0 flex-col items-end gap-0.5">
+                    <span
+                      className={cn(
+                        'font-mono text-sm font-medium',
+                        getCapacityColor(cls.attendance_count, cls.max_capacity),
+                      )}
+                    >
+                      {cls.attendance_count}
+                      <span className="font-normal text-muted-foreground">
+                        /{cls.max_capacity}
+                      </span>
                     </span>
-                  </span>
-                  <span className="text-[10px] text-muted-foreground/60">
-                    asistentes
-                  </span>
-                </div>
+                    <span className="text-[10px] text-muted-foreground/60">
+                      asistentes
+                    </span>
+                  </div>
 
-                <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground/30 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-muted-foreground/60" />
-              </div>
-            ))}
+                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground/30 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-muted-foreground/60" />
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

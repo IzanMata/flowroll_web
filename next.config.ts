@@ -1,7 +1,11 @@
 import type { NextConfig } from 'next';
 
+if (process.env.NODE_ENV === 'production' && !process.env.BACKEND_URL) {
+  throw new Error(
+    'BACKEND_URL environment variable is required in production.',
+  );
+}
 const BACKEND_URL = process.env.BACKEND_URL ?? 'http://127.0.0.1:8000';
-const isDev = process.env.NODE_ENV === 'development';
 
 const nextConfig: NextConfig = {
   // Proxy unmatched /api/* requests to the Django backend.
@@ -17,7 +21,10 @@ const nextConfig: NextConfig = {
     };
   },
 
-  // Security headers applied to every response.
+  // Static security headers applied to every response.
+  // Content-Security-Policy is intentionally absent here — it is set
+  // dynamically per request in middleware.ts so that a unique nonce can be
+  // embedded (replaces the insecure 'unsafe-inline' directive).
   async headers() {
     return [
       {
@@ -31,16 +38,8 @@ const nextConfig: NextConfig = {
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              `script-src 'self'${isDev ? " 'unsafe-eval'" : ''} 'unsafe-inline'`,
-              "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob:",
-              "font-src 'self' data:",
-              "connect-src 'self'",
-              "frame-ancestors 'none'",
-            ].join('; '),
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(), payment=()',
           },
         ],
       },

@@ -95,6 +95,7 @@
   }
   .animate-slide-up {
     animation: slide-up 0.3s ease-out both;
+    animation-delay: var(--slide-delay, 0ms);
   }
 
   /* Belt colors */

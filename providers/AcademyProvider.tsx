@@ -10,7 +10,15 @@ import { AcademyContext } from '@/hooks/useAcademy';
 const ACADEMY_KEY = 'flowroll_active_academy';
 
 export function AcademyProvider({ children }: { children: React.ReactNode }) {
-  const [activeAcademy, setActiveAcademyState] = useState<Academy | null>(null);
+  // Read from localStorage synchronously so academyId is available on the
+  // first render — prevents the query-disabled flash when academyId is null.
+  const [activeAcademy, setActiveAcademyState] = useState<Academy | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const stored = localStorage.getItem(ACADEMY_KEY);
+    if (!stored) return null;
+    const id = parseInt(stored, 10);
+    return isNaN(id) ? null : ({ id } as Academy); // minimal shape; replaced once query resolves
+  });
 
   const { data: academies = [], isLoading } = useQuery<Academy[]>({
     queryKey: ['academies', 'my'],
@@ -22,6 +30,8 @@ export function AcademyProvider({ children }: { children: React.ReactNode }) {
     },
   });
 
+  // Once the full academy list is available, replace the minimal placeholder
+  // with the real Academy object (or fall back to the first academy).
   useEffect(() => {
     if (academies.length === 0) return;
     const stored = localStorage.getItem(ACADEMY_KEY);

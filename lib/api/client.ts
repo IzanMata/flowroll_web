@@ -1,5 +1,13 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { ENDPOINTS } from './endpoints';
+import type { ApiError } from '@/types/api';
+
+/** Type-safe helper to extract the DRF `detail` field from an Axios error. */
+export function getApiErrorDetail(error: unknown): string | undefined {
+  if (!axios.isAxiosError(error)) return undefined;
+  const data = error.response?.data as ApiError | undefined;
+  return typeof data?.detail === 'string' ? data.detail : undefined;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Axios instance — same-origin requests; the middleware + rewrite layer in
