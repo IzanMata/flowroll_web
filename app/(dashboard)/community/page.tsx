@@ -6,8 +6,10 @@ import { useAcademyId } from '@/hooks/useAcademy';
 import apiClient from '@/lib/api/client';
 import { ENDPOINTS } from '@/lib/api/endpoints';
 import { formatDateTime } from '@/lib/utils/date';
+import { getFullName } from '@/lib/utils/user';
 import type { Achievement, OpenMatSession, PaginatedResponse } from '@/types/api';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -34,10 +36,6 @@ function OpenMatSkeleton() {
 }
 
 function OpenMatCard({ session }: { session: OpenMatSession }) {
-  const hostName =
-    [session.host.user.first_name, session.host.user.last_name]
-      .filter(Boolean)
-      .join(' ') || session.host.user.username;
   const spotsLeft = session.max_participants - session.participant_count;
 
   return (
@@ -47,7 +45,7 @@ function OpenMatCard({ session }: { session: OpenMatSession }) {
           {session.title}
         </p>
         <p className="text-xs text-muted-foreground">
-          {formatDateTime(session.scheduled_at)} · {hostName}
+          {formatDateTime(session.scheduled_at)} · {getFullName(session.host.user)}
         </p>
       </div>
       <div className="flex shrink-0 flex-col items-end gap-0.5">
@@ -151,14 +149,7 @@ export default function CommunityPage() {
 
   return (
     <div className="space-y-10 animate-fade-in">
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Academia
-        </p>
-        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
-          Comunidad
-        </h2>
-      </div>
+      <PageHeader eyebrow="Academia" title="Comunidad" />
 
       {/* Open Mat */}
       <section className="space-y-4">

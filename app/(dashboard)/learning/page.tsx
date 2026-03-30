@@ -4,8 +4,11 @@ import { useQuery } from '@tanstack/react-query';
 import { BookOpen, MessageSquare } from 'lucide-react';
 import apiClient from '@/lib/api/client';
 import { ENDPOINTS } from '@/lib/api/endpoints';
+import { formatLocalDate } from '@/lib/utils/date';
+import { getFullName } from '@/lib/utils/user';
 import type { PaginatedResponse, SparringNote, TechniqueNote } from '@/types/api';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -42,11 +45,6 @@ function TechniqueNoteSkeleton() {
 }
 
 function TechniqueNoteCard({ note }: { note: TechniqueNote }) {
-  const drilledDate = new Date(note.drilled_at).toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-white/[0.06] bg-card px-4 py-3.5 transition-all duration-200 hover:border-white/[0.1] hover:bg-white/[0.03]">
       <div className="flex items-start justify-between gap-2">
@@ -54,7 +52,9 @@ function TechniqueNoteCard({ note }: { note: TechniqueNote }) {
           <p className="text-sm font-medium text-foreground">
             {note.technique.name}
           </p>
-          <p className="text-xs text-muted-foreground">{drilledDate}</p>
+          <p className="text-xs text-muted-foreground">
+            {formatLocalDate(note.drilled_at)}
+          </p>
         </div>
         <RatingStars rating={note.rating} />
       </div>
@@ -82,16 +82,7 @@ function SparringNoteSkeleton() {
 }
 
 function SparringNoteCard({ note }: { note: SparringNote }) {
-  const noteDate = new Date(note.date).toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
-  const partnerName = note.partner
-    ? [note.partner.user.first_name, note.partner.user.last_name]
-        .filter(Boolean)
-        .join(' ') || note.partner.user.username
-    : null;
+  const partnerName = note.partner ? getFullName(note.partner.user) : null;
 
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-white/[0.06] bg-card px-4 py-3.5 transition-all duration-200 hover:border-white/[0.1] hover:bg-white/[0.03]">
@@ -99,7 +90,7 @@ function SparringNoteCard({ note }: { note: SparringNote }) {
         <p className="text-sm font-medium text-foreground">
           {partnerName ? `Sparring con ${partnerName}` : 'Sparring'}
         </p>
-        <p className="text-xs text-muted-foreground">{noteDate}</p>
+        <p className="text-xs text-muted-foreground">{formatLocalDate(note.date)}</p>
       </div>
       {note.notes && (
         <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
@@ -144,17 +135,11 @@ export default function LearningPage() {
 
   return (
     <div className="space-y-10 animate-fade-in">
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Diario
-        </p>
-        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
-          Aprendizaje
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Tus notas de entrenamiento
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Diario"
+        title="Aprendizaje"
+        subtitle="Tus notas de entrenamiento"
+      />
 
       {/* Technique Notes */}
       <section className="space-y-4">

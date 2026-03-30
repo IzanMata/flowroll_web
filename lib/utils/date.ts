@@ -30,3 +30,14 @@ export function getGreeting(): string {
   if (h < 20) return 'Buenas tardes';
   return 'Buenas noches';
 }
+
+const LOCAL_DATE_FORMATTER = new Intl.DateTimeFormat('es-ES', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+
+/** Formats an ISO date string as a short local date, e.g. "3 ene 2026" */
+export function formatLocalDate(iso: string): string {
+  return LOCAL_DATE_FORMATTER.format(new Date(iso));
+}

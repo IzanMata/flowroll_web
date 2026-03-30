@@ -11,6 +11,7 @@ import { getCapacityColor } from '@/lib/utils/capacity';
 import { CLASS_TYPE_CONFIG } from '@/lib/utils/class-type';
 import type { ClassType, PaginatedResponse, TrainingClass } from '@/types/api';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
@@ -38,7 +39,7 @@ export default function ClassesPage() {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<ClassType | 'ALL'>('ALL');
 
-  const { data: page, isLoading } = useQuery<PaginatedResponse<TrainingClass>>({
+  const { data: page, isLoading, isError } = useQuery<PaginatedResponse<TrainingClass>>({
     queryKey: ['classes', 'list', academyId],
     queryFn: async () => {
       const { data } = await apiClient.get<PaginatedResponse<TrainingClass>>(
@@ -67,21 +68,15 @@ export default function ClassesPage() {
     return matchesType && matchesSearch;
   });
 
+  const subtitle = isLoading
+    ? '…'
+    : isError
+      ? 'No se pudo cargar la lista'
+      : `${page?.count ?? 0} clase${page?.count !== 1 ? 's' : ''} registradas`;
+
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Academia
-        </p>
-        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
-          Clases
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {isLoading
-            ? '…'
-            : `${page?.count ?? 0} clase${page?.count !== 1 ? 's' : ''} registradas`}
-        </p>
-      </div>
+      <PageHeader eyebrow="Academia" title="Clases" subtitle={subtitle} />
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">

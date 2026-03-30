@@ -5,9 +5,11 @@ import { Swords } from 'lucide-react';
 import { useAcademyId } from '@/hooks/useAcademy';
 import apiClient from '@/lib/api/client';
 import { ENDPOINTS } from '@/lib/api/endpoints';
+import { getFullName } from '@/lib/utils/user';
 import type { Match, MatchStatus, PaginatedResponse } from '@/types/api';
 import { BeltBadge } from '@/components/shared/BeltBadge';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -42,16 +44,10 @@ function MatchRowSkeleton() {
   );
 }
 
-function athleteName(m: Match, side: 'a' | 'b') {
-  const profile = side === 'a' ? m.athlete_a : m.athlete_b;
-  const { first_name, last_name, username } = profile.user;
-  return [first_name, last_name].filter(Boolean).join(' ') || username;
-}
-
 export default function MatchesPage() {
   const academyId = useAcademyId();
 
-  const { data: page, isLoading } = useQuery<PaginatedResponse<Match>>({
+  const { data: page, isLoading, isError } = useQuery<PaginatedResponse<Match>>({
     queryKey: ['matches', 'list', academyId],
     queryFn: async () => {
       const { data } = await apiClient.get<PaginatedResponse<Match>>(
@@ -71,21 +67,15 @@ export default function MatchesPage() {
 
   const matches = page?.results ?? [];
 
+  const subtitle = isLoading
+    ? '…'
+    : isError
+      ? 'No se pudo cargar la lista'
+      : `${page?.count ?? 0} combate${page?.count !== 1 ? 's' : ''} registrados`;
+
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Academia
-        </p>
-        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
-          Combates
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {isLoading
-            ? '…'
-            : `${page?.count ?? 0} combate${page?.count !== 1 ? 's' : ''} registrados`}
-        </p>
-      </div>
+      <PageHeader eyebrow="Academia" title="Combates" subtitle={subtitle} />
 
       {isLoading ? (
         <div className="space-y-2">
@@ -119,7 +109,7 @@ export default function MatchesPage() {
                           aWon ? 'text-emerald-400' : 'text-foreground',
                         )}
                       >
-                        {athleteName(match, 'a')}
+                        {getFullName(match.athlete_a.user)}
                       </span>
                       <BeltBadge color={match.athlete_a.belt.color} size="sm" />
                     </div>
@@ -131,7 +121,7 @@ export default function MatchesPage() {
                           bWon ? 'text-emerald-400' : 'text-foreground',
                         )}
                       >
-                        {athleteName(match, 'b')}
+                        {getFullName(match.athlete_b.user)}
                       </span>
                       <BeltBadge color={match.athlete_b.belt.color} size="sm" />
                     </div>

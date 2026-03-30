@@ -5,10 +5,10 @@ import type { Technique } from '@/types/api';
 import { fetchTechniques } from '../api/fetchTechniques';
 
 export function useTechniques() {
-  const { data = [], isLoading: loading, error } = useQuery<Technique[]>({
+  const { data = [], isLoading, error } = useQuery<Technique[]>({
     queryKey: ['techniques'],
     queryFn: fetchTechniques,
   });
 
-  return { data, loading, error };
+  return { data, isLoading, error };
 }

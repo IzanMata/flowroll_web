@@ -6,9 +6,11 @@ import { Users } from 'lucide-react';
 import { useAcademyId } from '@/hooks/useAcademy';
 import apiClient from '@/lib/api/client';
 import { ENDPOINTS } from '@/lib/api/endpoints';
+import { getFullName } from '@/lib/utils/user';
 import type { AthleteProfile, PaginatedResponse } from '@/types/api';
 import { BeltBadge } from '@/components/shared/BeltBadge';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -42,7 +44,7 @@ export default function AthletesPage() {
   const academyId = useAcademyId();
   const [search, setSearch] = useState('');
 
-  const { data: page, isLoading } = useQuery<PaginatedResponse<AthleteProfile>>({
+  const { data: page, isLoading, isError } = useQuery<PaginatedResponse<AthleteProfile>>({
     queryKey: ['athletes', 'list', academyId],
     queryFn: async () => {
       const { data } = await apiClient.get<PaginatedResponse<AthleteProfile>>(
@@ -57,33 +59,21 @@ export default function AthletesPage() {
   const athletes = page?.results ?? [];
   const q = search.trim().toLowerCase();
   const filtered = q
-    ? athletes.filter(
-        (a) =>
-          a.user.username.toLowerCase().includes(q) ||
-          a.user.first_name.toLowerCase().includes(q) ||
-          a.user.last_name.toLowerCase().includes(q),
-      )
+    ? athletes.filter((a) => {
+        const full = getFullName(a.user).toLowerCase();
+        return full.includes(q) || a.user.username.toLowerCase().includes(q);
+      })
     : athletes;
 
-  const fullName = (a: AthleteProfile) =>
-    [a.user.first_name, a.user.last_name].filter(Boolean).join(' ') ||
-    a.user.username;
+  const subtitle = isLoading
+    ? '…'
+    : isError
+      ? 'No se pudo cargar la lista'
+      : `${page?.count ?? 0} atleta${page?.count !== 1 ? 's' : ''} registrados`;
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Academia
-        </p>
-        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
-          Atletas
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {isLoading
-            ? '…'
-            : `${page?.count ?? 0} atleta${page?.count !== 1 ? 's' : ''} registrados`}
-        </p>
-      </div>
+      <PageHeader eyebrow="Academia" title="Atletas" subtitle={subtitle} />
 
       <div className="max-w-sm">
         <Input
@@ -116,11 +106,11 @@ export default function AthletesPage() {
               key={athlete.id}
               className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-card px-4 py-3.5 transition-all duration-200 hover:border-white/[0.1] hover:bg-white/[0.03]"
             >
-              <AvatarInitials name={fullName(athlete)} />
+              <AvatarInitials name={getFullName(athlete.user)} />
 
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-foreground">
-                  {fullName(athlete)}
+                  {getFullName(athlete.user)}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   @{athlete.user.username}

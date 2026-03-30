@@ -7,6 +7,7 @@ import apiClient from '@/lib/api/client';
 import { ENDPOINTS } from '@/lib/api/endpoints';
 import type { MembershipPlan, PaginatedResponse } from '@/types/api';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -76,7 +77,7 @@ function PlanCard({ plan }: { plan: MembershipPlan }) {
 export default function MembershipPage() {
   const academyId = useAcademyId();
 
-  const { data: page, isLoading } = useQuery<PaginatedResponse<MembershipPlan>>({
+  const { data: page, isLoading, isError } = useQuery<PaginatedResponse<MembershipPlan>>({
     queryKey: ['membership', 'plans', academyId],
     queryFn: async () => {
       const { data } = await apiClient.get<PaginatedResponse<MembershipPlan>>(
@@ -90,21 +91,15 @@ export default function MembershipPage() {
 
   const plans = page?.results ?? [];
 
+  const subtitle = isLoading
+    ? '…'
+    : isError
+      ? 'No se pudo cargar los planes'
+      : `${plans.length} plan${plans.length !== 1 ? 'es' : ''} disponible${plans.length !== 1 ? 's' : ''}`;
+
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Academia
-        </p>
-        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
-          Membresías
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {isLoading
-            ? '…'
-            : `${plans.length} plan${plans.length !== 1 ? 'es' : ''} disponible${plans.length !== 1 ? 's' : ''}`}
-        </p>
-      </div>
+      <PageHeader eyebrow="Academia" title="Membresías" subtitle={subtitle} />
 
       {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

@@ -94,7 +94,7 @@ function TechniqueCardSkeleton() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function TechniquesPage() {
-  const { data: techniques, loading } = useTechniques();
+  const { data: techniques, isLoading } = useTechniques();
   const [search, setSearch] = useState('');
 
   const filtered = search.trim()
@@ -132,7 +132,7 @@ export default function TechniquesPage() {
       </div>
 
       {/* Grid */}
-      {loading ? (
+      {isLoading ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <TechniqueCardSkeleton key={i} />
