@@ -49,10 +49,21 @@ apiClient.interceptors.response.use(
     const isRefreshEndpoint = originalRequest.url?.includes(
       ENDPOINTS.AUTH.REFRESH,
     );
+    // ME is a session-check call — a 401 means "not logged in", not an expired
+    // token that needs refreshing. Attempting a refresh here causes an infinite
+    // reload loop on the login page when the app starts without a session.
+    // TOKEN is the login endpoint — a 401 means wrong credentials, not an
+    // expired token; attempting a refresh here would be nonsensical.
+    const isMeEndpoint = originalRequest.url?.includes(ENDPOINTS.AUTH.ME);
+    const isTokenEndpoint = originalRequest.url?.includes(ENDPOINTS.AUTH.TOKEN) &&
+      !originalRequest.url?.includes(ENDPOINTS.AUTH.REFRESH);
 
-    // If 401 on the refresh endpoint itself → session is dead
-    if (is401 && isRefreshEndpoint) {
-      if (typeof window !== 'undefined') {
+    // If 401 on the refresh endpoint, session-check, or login → bail out
+    if (is401 && (isRefreshEndpoint || isMeEndpoint || isTokenEndpoint)) {
+      if (
+        typeof window !== 'undefined' &&
+        window.location.pathname !== '/login'
+      ) {
         window.location.href = '/login';
       }
       return Promise.reject(error);
@@ -79,7 +90,10 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError);
-        if (typeof window !== 'undefined') {
+        if (
+          typeof window !== 'undefined' &&
+          window.location.pathname !== '/login'
+        ) {
           window.location.href = '/login';
         }
         return Promise.reject(refreshError);
