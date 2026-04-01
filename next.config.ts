@@ -8,6 +8,10 @@ if (process.env.NODE_ENV === 'production' && !process.env.BACKEND_URL) {
 const BACKEND_URL = process.env.BACKEND_URL ?? 'http://127.0.0.1:8000';
 
 const nextConfig: NextConfig = {
+  // 'standalone' is only needed for Docker deployments (e.g. self-hosted).
+  // On Vercel, omit it so Vercel can use its own optimised output format.
+  ...(process.env.DOCKER_BUILD === 'true' && { output: 'standalone' }),
+
   // Proxy unmatched /api/* requests to the Django backend.
   // Route Handlers (app/api/auth/*) take priority over these rewrites.
   async rewrites() {
