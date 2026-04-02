@@ -10,9 +10,17 @@ import {
 import { useRouter } from 'next/navigation';
 import apiClient from '@/lib/api/client';
 import { ENDPOINTS } from '@/lib/api/endpoints';
-import type { TokenObtainRequest, User } from '@/types/api';
+import type { AcademyWithRole, TokenObtainRequest } from '@/types/api';
 
-export type AuthUser = Pick<User, 'id' | 'username'>;
+export interface AuthUser {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  email_verified: boolean;
+  academies: AcademyWithRole[];
+}
 
 interface AuthContextValue {
   user: AuthUser | null;

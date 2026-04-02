@@ -8,6 +8,7 @@ import {
   CreditCard,
   LayoutDashboard,
   MessageSquare,
+  Settings,
   Shield,
   Swords,
   Timer,
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
   { href: '/membership', label: 'Membresías', icon: CreditCard },
   { href: '/learning', label: 'Aprendizaje', icon: BookOpen },
   { href: '/community', label: 'Comunidad', icon: MessageSquare },
+  { href: '/settings', label: 'Configuración', icon: Settings },
 ] as const;
 
 export function Sidebar() {

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import Link from 'next/link';
 import { Loader2, Shield } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -156,9 +157,28 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
+
+          <div className="mt-4 text-center">
+            <Link
+              href="/password-reset"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
         </div>
 
-        <p className="mt-6 text-center text-xs text-muted-foreground/50">
+        <p className="mt-5 text-center text-sm text-muted-foreground">
+          ¿No tienes cuenta?{' '}
+          <Link
+            href="/register"
+            className="text-blue-400 hover:text-blue-300 transition-colors"
+          >
+            Crear cuenta
+          </Link>
+        </p>
+
+        <p className="mt-4 text-center text-xs text-muted-foreground/50">
           FlowRoll &copy; {new Date().getFullYear()}
         </p>
       </div>
