@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -28,7 +28,7 @@ const schema = z
 
 type FormValues = z.infer<typeof schema>;
 
-export default function PasswordResetConfirmPage() {
+function PasswordResetConfirmContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const uid = searchParams.get('uid');
@@ -45,19 +45,15 @@ export default function PasswordResetConfirmPage() {
 
   if (!uid || !token) {
     return (
-      <div className="relative flex min-h-screen w-full items-center justify-center bg-[#080808]">
-        <div className="w-full max-w-[360px] px-5 text-center">
-          <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-8 shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
-            <XCircle className="mx-auto mb-4 h-10 w-10 text-red-400" />
-            <h2 className="font-semibold text-foreground">Enlace inválido</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Este enlace de restablecimiento no es válido o ha expirado.
-            </p>
-            <Button asChild variant="outline" className="mt-4 w-full">
-              <Link href="/password-reset">Solicitar nuevo enlace</Link>
-            </Button>
-          </div>
-        </div>
+      <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-8 shadow-[0_8px_40px_rgba(0,0,0,0.5)] text-center">
+        <XCircle className="mx-auto mb-4 h-10 w-10 text-red-400" />
+        <h2 className="font-semibold text-foreground">Enlace inválido</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Este enlace de restablecimiento no es válido o ha expirado.
+        </p>
+        <Button asChild variant="outline" className="mt-4 w-full">
+          <Link href="/password-reset">Solicitar nuevo enlace</Link>
+        </Button>
       </div>
     );
   }
@@ -73,11 +69,7 @@ export default function PasswordResetConfirmPage() {
       setSuccess(true);
       setTimeout(() => router.push('/login'), 2500);
     } catch (err: unknown) {
-      if (
-        typeof err === 'object' &&
-        err !== null &&
-        'response' in err
-      ) {
+      if (typeof err === 'object' && err !== null && 'response' in err) {
         const axiosErr = err as { response?: { data?: Record<string, unknown> } };
         const data = axiosErr.response?.data;
         if (data) {
@@ -91,6 +83,91 @@ export default function PasswordResetConfirmPage() {
     }
   }
 
+  return (
+    <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-7 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-sm">
+      {success ? (
+        <div className="flex flex-col items-center gap-4 text-center">
+          <CheckCircle className="h-10 w-10 text-emerald-400" />
+          <div>
+            <p className="font-medium text-foreground">Contraseña restablecida</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Redirigiendo al inicio de sesión…
+            </p>
+          </div>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <div className="space-y-2">
+            <Label
+              htmlFor="new_password"
+              className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
+            >
+              Nueva contraseña
+            </Label>
+            <Input
+              id="new_password"
+              type="password"
+              placeholder="••••••••"
+              autoComplete="new-password"
+              autoFocus
+              {...register('new_password')}
+            />
+            {errors.new_password && (
+              <p className="text-xs text-destructive">
+                {errors.new_password.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label
+              htmlFor="new_password_confirm"
+              className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
+            >
+              Confirmar contraseña
+            </Label>
+            <Input
+              id="new_password_confirm"
+              type="password"
+              placeholder="••••••••"
+              autoComplete="new-password"
+              {...register('new_password_confirm')}
+            />
+            {errors.new_password_confirm && (
+              <p className="text-xs text-destructive">
+                {errors.new_password_confirm.message}
+              </p>
+            )}
+          </div>
+
+          {apiError && (
+            <div className="rounded-lg border border-red-500/20 bg-red-500/[0.07] px-4 py-3">
+              <p className="text-sm text-red-400">{apiError}</p>
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            className="mt-1 w-full"
+            size="lg"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Guardando…
+              </>
+            ) : (
+              'Restablecer contraseña'
+            )}
+          </Button>
+        </form>
+      )}
+    </div>
+  );
+}
+
+export default function PasswordResetConfirmPage() {
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#080808]">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -121,88 +198,15 @@ export default function PasswordResetConfirmPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-7 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-sm">
-          {success ? (
-            <div className="flex flex-col items-center gap-4 text-center">
-              <CheckCircle className="h-10 w-10 text-emerald-400" />
-              <div>
-                <p className="font-medium text-foreground">
-                  Contraseña restablecida
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Redirigiendo al inicio de sesión…
-                </p>
-              </div>
+        <Suspense
+          fallback={
+            <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-8 text-center">
+              <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-400" />
             </div>
-          ) : (
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="new_password"
-                  className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
-                >
-                  Nueva contraseña
-                </Label>
-                <Input
-                  id="new_password"
-                  type="password"
-                  placeholder="••••••••"
-                  autoComplete="new-password"
-                  autoFocus
-                  {...register('new_password')}
-                />
-                {errors.new_password && (
-                  <p className="text-xs text-destructive">
-                    {errors.new_password.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="new_password_confirm"
-                  className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
-                >
-                  Confirmar contraseña
-                </Label>
-                <Input
-                  id="new_password_confirm"
-                  type="password"
-                  placeholder="••••••••"
-                  autoComplete="new-password"
-                  {...register('new_password_confirm')}
-                />
-                {errors.new_password_confirm && (
-                  <p className="text-xs text-destructive">
-                    {errors.new_password_confirm.message}
-                  </p>
-                )}
-              </div>
-
-              {apiError && (
-                <div className="rounded-lg border border-red-500/20 bg-red-500/[0.07] px-4 py-3">
-                  <p className="text-sm text-red-400">{apiError}</p>
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                className="mt-1 w-full"
-                size="lg"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Guardando…
-                  </>
-                ) : (
-                  'Restablecer contraseña'
-                )}
-              </Button>
-            </form>
-          )}
-        </div>
+          }
+        >
+          <PasswordResetConfirmContent />
+        </Suspense>
 
         <p className="mt-5 text-center text-sm text-muted-foreground">
           <Link

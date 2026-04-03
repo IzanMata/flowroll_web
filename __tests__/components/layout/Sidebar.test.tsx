@@ -33,12 +33,14 @@ describe('Sidebar', () => {
     expect(screen.getByText('Membresías')).toBeInTheDocument();
     expect(screen.getByText('Aprendizaje')).toBeInTheDocument();
     expect(screen.getByText('Comunidad')).toBeInTheDocument();
+    expect(screen.getByText('Configuración')).toBeInTheDocument();
   });
 
   it('renders nav links with correct hrefs', () => {
     render(<Sidebar />);
     expect(screen.getByRole('link', { name: /Dashboard/i })).toHaveAttribute('href', '/dashboard');
     expect(screen.getByRole('link', { name: /Atletas/i })).toHaveAttribute('href', '/athletes');
+    expect(screen.getByRole('link', { name: /Configuración/i })).toHaveAttribute('href', '/settings');
   });
 
   it('shows active state for current pathname', async () => {
