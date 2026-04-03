@@ -257,6 +257,30 @@ export interface TimerSession {
   finished_at?: string | null;
 }
 
+// Tatami — Matchups & Weight Classes
+export interface WeightClass {
+  id: number;
+  name: string;
+  min_kg?: number | null;
+  max_kg?: number | null;
+}
+
+export interface Matchup {
+  id: number;
+  academy: number;
+  athlete_a: AthleteProfile;
+  athlete_b: AthleteProfile;
+  weight_class?: WeightClass | null;
+  scheduled_at?: string | null;
+  result?: 'A_WIN' | 'B_WIN' | 'DRAW' | null;
+}
+
+export interface PairAthletesRequest {
+  athlete_a_id: number;
+  athlete_b_id: number;
+  weight_class_id?: number;
+}
+
 // Membership
 export type SubscriptionStatus = 'ACTIVE' | 'EXPIRED' | 'CANCELLED' | 'PENDING';
 
@@ -317,6 +341,13 @@ export interface Seminar {
   price: string;
   capacity: number;
   registered_count: number;
+}
+
+export interface SeminarRegistration {
+  id: number;
+  seminar: number;
+  athlete: number;
+  registered_at: string;
 }
 
 // Belt mutation requests

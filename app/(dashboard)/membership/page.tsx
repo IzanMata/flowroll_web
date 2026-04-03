@@ -2,16 +2,32 @@
 
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CheckCircle, CreditCard, Loader2, LogOut } from 'lucide-react';
+import {
+  Award,
+  CalendarCheck,
+  CheckCircle,
+  CreditCard,
+  Loader2,
+  LogOut,
+  TrendingUp,
+} from 'lucide-react';
 import { useAcademyId } from '@/hooks/useAcademy';
 import apiClient from '@/lib/api/client';
 import { ENDPOINTS } from '@/lib/api/endpoints';
-import type { MembershipPlan, PaginatedResponse, Subscription } from '@/types/api';
+import type {
+  MembershipPlan,
+  PaginatedResponse,
+  Promotion,
+  Seminar,
+  Subscription,
+} from '@/types/api';
+import { BeltBadge } from '@/components/shared/BeltBadge';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 const PERIOD_LABELS: Record<MembershipPlan['billing_period'], string> = {
   MONTHLY: 'mes',
@@ -323,6 +339,123 @@ function PlanCard({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Seminars section
+// ─────────────────────────────────────────────────────────────────────────────
+
+function SeminarCard({
+  seminar,
+  academyId,
+}: {
+  seminar: Seminar;
+  academyId: number;
+}) {
+  const queryClient = useQueryClient();
+  const [registered, setRegistered] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const isFull = seminar.registered_count >= seminar.capacity;
+
+  const registerMutation = useMutation({
+    mutationFn: async () => {
+      await apiClient.post(ENDPOINTS.MEMBERSHIP.SEMINAR_REGISTER(seminar.id));
+    },
+    onSuccess: () => {
+      setRegistered(true);
+      setError(null);
+      queryClient.invalidateQueries({ queryKey: ['membership', 'seminars', academyId] });
+    },
+    onError: () => setError('No se pudo registrar en el seminario.'),
+  });
+
+  return (
+    <div className="rounded-xl border border-white/[0.06] bg-card px-4 py-3.5 transition-all duration-200 hover:border-white/[0.1]">
+      <div className="flex items-start gap-3">
+        <div className="min-w-0 flex-1 space-y-1">
+          <p className="text-sm font-medium text-foreground">{seminar.title}</p>
+          <p className="text-xs text-muted-foreground">
+            {seminar.instructor} · {new Date(seminar.date).toLocaleDateString('es-ES')}
+          </p>
+          {seminar.description && (
+            <p className="text-xs text-muted-foreground/70 leading-relaxed">
+              {seminar.description}
+            </p>
+          )}
+          {error && <p className="text-xs text-red-400">{error}</p>}
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <span className="text-sm font-bold tabular-nums text-foreground">
+            {parseFloat(seminar.price).toLocaleString('es-ES', {
+              style: 'currency',
+              currency: 'EUR',
+            })}
+          </span>
+          <span
+            className={cn(
+              'text-[10px] font-mono',
+              isFull ? 'text-red-400' : 'text-muted-foreground/60',
+            )}
+          >
+            {seminar.registered_count}/{seminar.capacity}
+          </span>
+          {registered ? (
+            <span className="text-xs text-emerald-400 font-medium">Registrado</span>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={isFull || registerMutation.isPending}
+              onClick={() => registerMutation.mutate()}
+              className="h-7 text-xs"
+            >
+              {registerMutation.isPending ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : isFull ? (
+                'Completo'
+              ) : (
+                <>
+                  <CalendarCheck className="h-3 w-3" />
+                  Registrarme
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Promotions / belt history section
+// ─────────────────────────────────────────────────────────────────────────────
+
+function PromotionRow({ promotion }: { promotion: Promotion }) {
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-card px-4 py-3 transition-all duration-200 hover:border-white/[0.1]">
+      <TrendingUp className="h-4 w-4 shrink-0 text-amber-400" />
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2 flex-wrap">
+          <BeltBadge color={promotion.from_belt.color} stripes={promotion.from_belt.stripes} size="sm" />
+          <span className="text-xs text-muted-foreground/40">→</span>
+          <BeltBadge color={promotion.to_belt.color} stripes={promotion.to_belt.stripes} size="sm" />
+        </div>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          {new Date(promotion.promoted_at).toLocaleDateString('es-ES')}
+          {' · por '}
+          {promotion.promoted_by.user.first_name
+            ? `${promotion.promoted_by.user.first_name} ${promotion.promoted_by.user.last_name}`
+            : promotion.promoted_by.user.username}
+        </p>
+      </div>
+      {promotion.ceremony_notes && (
+        <p className="shrink-0 max-w-[160px] truncate text-xs text-muted-foreground/60 italic">
+          "{promotion.ceremony_notes}"
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Page
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -357,10 +490,40 @@ export default function MembershipPage() {
     enabled: !!academyId,
   });
 
+  const { data: seminarsPage, isLoading: loadingSeminars } = useQuery<
+    PaginatedResponse<Seminar>
+  >({
+    queryKey: ['membership', 'seminars', academyId],
+    queryFn: async () => {
+      const { data } = await apiClient.get<PaginatedResponse<Seminar>>(
+        ENDPOINTS.MEMBERSHIP.SEMINARS,
+        { params: { academy: academyId, ordering: 'date', page_size: 20 } },
+      );
+      return data;
+    },
+    enabled: !!academyId,
+  });
+
+  const { data: promotionsPage, isLoading: loadingPromotions } = useQuery<
+    PaginatedResponse<Promotion>
+  >({
+    queryKey: ['membership', 'promotions', academyId],
+    queryFn: async () => {
+      const { data } = await apiClient.get<PaginatedResponse<Promotion>>(
+        ENDPOINTS.MEMBERSHIP.PROMOTIONS,
+        { params: { academy: academyId, ordering: '-promoted_at', page_size: 20 } },
+      );
+      return data;
+    },
+    enabled: !!academyId,
+  });
+
   const plans = plansPage?.results ?? [];
   const subscriptions = subsPage?.results ?? [];
   const activeSubscription = subscriptions.find((s) => s.status === 'ACTIVE');
   const hasActiveSubscription = !!activeSubscription;
+  const seminars = seminarsPage?.results ?? [];
+  const promotions = promotionsPage?.results ?? [];
 
   const isLoading = loadingPlans || loadingSubs;
 
@@ -371,7 +534,7 @@ export default function MembershipPage() {
       : `${plans.length} plan${plans.length !== 1 ? 'es' : ''} disponible${plans.length !== 1 ? 's' : ''}`;
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-10 animate-fade-in">
       <PageHeader eyebrow="Academia" title="Membresías" subtitle={subtitle} />
 
       {/* Active subscription */}
@@ -385,29 +548,102 @@ export default function MembershipPage() {
       ) : null}
 
       {/* Plans */}
-      {isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <PlanCardSkeleton key={i} />
-          ))}
-        </div>
-      ) : plans.length === 0 ? (
-        <EmptyState
-          icon={CreditCard}
-          title="Sin planes"
-          description="No hay planes de membresía configurados en esta academia."
-        />
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {plans.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              hasActiveSubscription={hasActiveSubscription}
-            />
-          ))}
-        </div>
-      )}
+      <section className="space-y-4">
+        <h3 className="text-sm font-medium text-foreground">Planes</h3>
+        {isLoading ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <PlanCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : plans.length === 0 ? (
+          <EmptyState
+            icon={CreditCard}
+            title="Sin planes"
+            description="No hay planes de membresía configurados en esta academia."
+          />
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {plans.map((plan) => (
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                hasActiveSubscription={hasActiveSubscription}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Seminars */}
+      <section className="space-y-4">
+        <h3 className="text-sm font-medium text-foreground">Seminarios</h3>
+        {loadingSeminars ? (
+          <div className="space-y-2">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="rounded-xl border border-white/[0.06] bg-card px-4 py-3.5">
+                <div className="flex items-start gap-3">
+                  <div className="flex-1 space-y-1.5">
+                    <Skeleton className="h-3.5 w-48" />
+                    <Skeleton className="h-3 w-32" />
+                    <Skeleton className="h-3 w-full" />
+                  </div>
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-7 w-24" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : seminars.length === 0 ? (
+          <EmptyState
+            icon={CalendarCheck}
+            title="Sin seminarios"
+            description="No hay seminarios programados en esta academia."
+          />
+        ) : (
+          <div className="space-y-2">
+            {seminars.map((s) => (
+              <SeminarCard key={s.id} seminar={s} academyId={academyId!} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Belt promotion history */}
+      <section className="space-y-4">
+        <h3 className="text-sm font-medium text-foreground">Historial de cinturones</h3>
+        {loadingPromotions ? (
+          <div className="space-y-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-card px-4 py-3">
+                <Skeleton className="h-4 w-4 shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-16 rounded" />
+                    <Skeleton className="h-3 w-3" />
+                    <Skeleton className="h-4 w-16 rounded" />
+                  </div>
+                  <Skeleton className="h-3 w-36" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : promotions.length === 0 ? (
+          <EmptyState
+            icon={Award}
+            title="Sin promociones"
+            description="No hay historial de promociones de cinturón."
+          />
+        ) : (
+          <div className="space-y-2">
+            {promotions.map((p) => (
+              <PromotionRow key={p.id} promotion={p} />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
