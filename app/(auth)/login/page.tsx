@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Loader2, Shield } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { GoogleSignInButton } from '@/components/shared/GoogleSignInButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,6 +27,18 @@ const loginSchema = z.object({
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
+
+function GoogleErrorBanner() {
+  const params = useSearchParams();
+  if (params.get('error') !== 'google_auth_failed') return null;
+  return (
+    <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/[0.07] px-4 py-3">
+      <p className="text-sm text-red-400">
+        No se pudo autenticar con Google. Inténtalo de nuevo.
+      </p>
+    </div>
+  );
+}
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -70,6 +84,11 @@ export default function LoginPage() {
 
       {/* Form container */}
       <div className="relative w-full max-w-[360px] animate-slide-up px-5">
+        {/* Google OAuth error banner (needs Suspense for useSearchParams) */}
+        <Suspense>
+          <GoogleErrorBanner />
+        </Suspense>
+
         {/* Logo + heading */}
         <div className="mb-8 flex flex-col items-center gap-4">
           <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-glow-blue">
@@ -88,6 +107,15 @@ export default function LoginPage() {
 
         {/* Card */}
         <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-7 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-sm">
+          {/* Google sign-in */}
+          <GoogleSignInButton />
+
+          <div className="relative my-5 flex items-center">
+            <div className="flex-1 border-t border-white/[0.07]" />
+            <span className="mx-3 text-xs text-muted-foreground/50">o</span>
+            <div className="flex-1 border-t border-white/[0.07]" />
+          </div>
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Username */}
             <div className="space-y-2">

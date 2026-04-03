@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { Loader2, Shield } from 'lucide-react';
 import apiClient from '@/lib/api/client';
 import { ENDPOINTS } from '@/lib/api/endpoints';
+import { GoogleSignInButton } from '@/components/shared/GoogleSignInButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -121,6 +122,15 @@ export default function RegisterPage() {
 
         {/* Card */}
         <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-7 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-sm">
+          {/* Google sign-in */}
+          <GoogleSignInButton label="Registrarse con Google" />
+
+          <div className="relative my-5 flex items-center">
+            <div className="flex-1 border-t border-white/[0.07]" />
+            <span className="mx-3 text-xs text-muted-foreground/50">o</span>
+            <div className="flex-1 border-t border-white/[0.07]" />
+          </div>
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Name row */}
             <div className="grid grid-cols-2 gap-3">
