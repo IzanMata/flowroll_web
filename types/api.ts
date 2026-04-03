@@ -17,6 +17,33 @@ export interface TokenObtainRequest {
   password: string;
 }
 
+export interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+  first_name?: string;
+  last_name?: string;
+}
+
+export interface VerifyEmailRequest {
+  token: string;
+}
+
+export interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
+}
+
+export interface PasswordResetRequest {
+  email: string;
+}
+
+export interface PasswordResetConfirmRequest {
+  uid: string;
+  token: string;
+  new_password: string;
+}
+
 // User
 export interface User {
   id: number;
@@ -24,6 +51,20 @@ export interface User {
   email: string;
   first_name: string;
   last_name: string;
+}
+
+// Extended user returned by GET /api/auth/me/
+export type AcademyRole = 'OWNER' | 'INSTRUCTOR' | 'ATHLETE';
+
+export interface AcademyWithRole {
+  id: number;
+  name: string;
+  role: AcademyRole;
+}
+
+export interface AuthMeUser extends User {
+  email_verified: boolean;
+  academies: AcademyWithRole[];
 }
 
 // Academy (tenant root)
@@ -40,6 +81,37 @@ export interface AcademyRequest {
   address?: string;
   phone?: string;
   email?: string;
+}
+
+export interface PublicAcademy {
+  id: number;
+  name: string;
+  city?: string;
+  country?: string;
+  description?: string;
+  athlete_count?: number;
+}
+
+export interface AcademyMember {
+  user_id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: AcademyRole;
+}
+
+export interface AddMemberRequest {
+  email: string;
+  role?: AcademyRole;
+}
+
+export interface UpdateMemberRoleRequest {
+  role: AcademyRole;
+}
+
+export interface EnrollRequest {
+  plan_id: number;
 }
 
 // Belt

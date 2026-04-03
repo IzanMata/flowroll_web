@@ -4,96 +4,110 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const ENDPOINTS = {
-  // Auth
+  // Auth — intentionally un-versioned (stable infrastructure)
   AUTH: {
     TOKEN: '/api/auth/token/',
     REFRESH: '/api/auth/token/refresh/',
     LOGOUT: '/api/auth/logout/',
     ME: '/api/auth/me/',
+    REGISTER: '/api/auth/register/',
+    VERIFY_EMAIL: '/api/auth/verify-email/',
+    RESEND_VERIFICATION: '/api/auth/resend-verification/',
+    CHANGE_PASSWORD: '/api/auth/change-password/',
+    PASSWORD_RESET: '/api/auth/password-reset/',
+    PASSWORD_RESET_CONFIRM: '/api/auth/password-reset/confirm/',
+    SOCIAL_GOOGLE: '/api/auth/social/google/',
   },
 
-  // Academies
+  // Academies — /api/v1/
   ACADEMIES: {
-    LIST: '/api/academies/',
-    DETAIL: (id: number) => `/api/academies/${id}/`,
-    MY_ACADEMIES: '/api/academies/',
+    LIST: '/api/v1/academies/',
+    DETAIL: (id: number) => `/api/v1/academies/${id}/`,
+    MY_ACADEMIES: '/api/v1/academies/',
+    PUBLIC: '/api/v1/academies/public/',
+    MEMBERS: (id: number) => `/api/v1/academies/${id}/members/`,
+    MEMBER_DETAIL: (academyId: number, userId: number) =>
+      `/api/v1/academies/${academyId}/members/${userId}/`,
   },
 
-  // Athletes
+  // Athletes — /api/v1/
   ATHLETES: {
-    LIST: '/api/athletes/',
-    DETAIL: (id: number) => `/api/athletes/${id}/`,
-    PROMOTE: (id: number) => `/api/athletes/${id}/promote/`,
-    QR_TOKEN: (id: number) => `/api/athletes/${id}/qr-token/`,
+    LIST: '/api/v1/athletes/',
+    DETAIL: (id: number) => `/api/v1/athletes/${id}/`,
+    PROMOTE: (id: number) => `/api/v1/athletes/${id}/promote/`,
+    QR_TOKEN: (id: number) => `/api/v1/athletes/${id}/qr-token/`,
   },
 
-  // Attendance / Classes
+  // Attendance / Classes — /api/v1/
   CLASSES: {
-    LIST: '/api/attendance/classes/',
-    DETAIL: (id: number) => `/api/attendance/classes/${id}/`,
-    CHECKIN_QR: '/api/attendance/classes/qr_checkin/',
-    CHECKIN_MANUAL: '/api/attendance/classes/manual_checkin/',
-    GENERATE_QR: (id: number) => `/api/attendance/classes/${id}/generate_qr/`,
-    DROP_INS: '/api/attendance/drop-ins/',
+    LIST: '/api/v1/attendance/classes/',
+    DETAIL: (id: number) => `/api/v1/attendance/classes/${id}/`,
+    CHECKIN_QR: '/api/v1/attendance/classes/qr_checkin/',
+    CHECKIN_MANUAL: '/api/v1/attendance/classes/manual_checkin/',
+    GENERATE_QR: (id: number) => `/api/v1/attendance/classes/${id}/generate_qr/`,
+    DROP_INS: '/api/v1/attendance/drop-ins/',
   },
 
-  // Matches
+  // Matches — /api/v1/
   MATCHES: {
-    LIST: '/api/matches/',
-    DETAIL: (id: number) => `/api/matches/${id}/`,
-    ADD_EVENT: (id: number) => `/api/matches/${id}/add_event/`,
-    FINISH: (id: number) => `/api/matches/${id}/finish_match/`,
+    LIST: '/api/v1/matches/',
+    DETAIL: (id: number) => `/api/v1/matches/${id}/`,
+    ADD_EVENT: (id: number) => `/api/v1/matches/${id}/add_event/`,
+    FINISH: (id: number) => `/api/v1/matches/${id}/finish_match/`,
   },
 
-  // Tatami / Timer
+  // Tatami / Timer — /api/v1/
   TATAMI: {
-    PRESETS: '/api/tatami/timer-presets/',
-    PRESET_DETAIL: (id: number) => `/api/tatami/timer-presets/${id}/`,
-    PRESET_START: (id: number) => `/api/tatami/timer-presets/${id}/start_session/`,
-    SESSIONS: '/api/tatami/timer-sessions/',
-    SESSION_DETAIL: (id: number) => `/api/tatami/timer-sessions/${id}/`,
-    SESSION_PAUSE: (id: number) => `/api/tatami/timer-sessions/${id}/pause/`,
-    SESSION_FINISH: (id: number) => `/api/tatami/timer-sessions/${id}/finish/`,
-    MATCHUPS: '/api/tatami/matchups/',
-    MATCHUP_PAIR: '/api/tatami/matchups/pair_athletes/',
-    WEIGHT_CLASSES: '/api/tatami/weight-classes/',
+    PRESETS: '/api/v1/tatami/timer-presets/',
+    PRESET_DETAIL: (id: number) => `/api/v1/tatami/timer-presets/${id}/`,
+    PRESET_START: (id: number) => `/api/v1/tatami/timer-presets/${id}/start_session/`,
+    SESSIONS: '/api/v1/tatami/timer-sessions/',
+    SESSION_DETAIL: (id: number) => `/api/v1/tatami/timer-sessions/${id}/`,
+    SESSION_PAUSE: (id: number) => `/api/v1/tatami/timer-sessions/${id}/pause/`,
+    SESSION_FINISH: (id: number) => `/api/v1/tatami/timer-sessions/${id}/finish/`,
+    MATCHUPS: '/api/v1/tatami/matchups/',
+    MATCHUP_PAIR: '/api/v1/tatami/matchups/pair_athletes/',
+    WEIGHT_CLASSES: '/api/v1/tatami/weight-classes/',
   },
 
-  // Membership
+  // Membership — /api/v1/
   MEMBERSHIP: {
-    PLANS: '/api/membership/plans/',
-    PLAN_DETAIL: (id: number) => `/api/membership/plans/${id}/`,
-    SUBSCRIPTIONS: '/api/membership/subscriptions/',
-    SUBSCRIPTION_DETAIL: (id: number) => `/api/membership/subscriptions/${id}/`,
-    PROMOTIONS: '/api/membership/promotions/',
-    PROMOTION_DETAIL: (id: number) => `/api/membership/promotions/${id}/`,
-    SEMINARS: '/api/membership/seminars/',
-    SEMINAR_DETAIL: (id: number) => `/api/membership/seminars/${id}/`,
-    SEMINAR_REGISTER: (id: number) => `/api/membership/seminars/${id}/register/`,
+    PLANS: '/api/v1/membership/plans/',
+    PLAN_DETAIL: (id: number) => `/api/v1/membership/plans/${id}/`,
+    SUBSCRIPTIONS: '/api/v1/membership/subscriptions/',
+    SUBSCRIPTION_DETAIL: (id: number) => `/api/v1/membership/subscriptions/${id}/`,
+    SUBSCRIPTION_CANCEL: (id: number) => `/api/v1/membership/subscriptions/${id}/cancel/`,
+    ENROLL: '/api/v1/membership/enroll/',
+    LEAVE: (academyId: number) => `/api/v1/membership/${academyId}/leave/`,
+    PROMOTIONS: '/api/v1/membership/promotions/',
+    PROMOTION_DETAIL: (id: number) => `/api/v1/membership/promotions/${id}/`,
+    SEMINARS: '/api/v1/membership/seminars/',
+    SEMINAR_DETAIL: (id: number) => `/api/v1/membership/seminars/${id}/`,
+    SEMINAR_REGISTER: (id: number) => `/api/v1/membership/seminars/${id}/register/`,
   },
 
-  // Techniques (platform library — no academy scoping)
+  // Techniques (platform library — no academy scoping) — /api/v1/
   TECHNIQUES: {
-    LIST: '/api/techniques/',
-    DETAIL: (id: number) => `/api/techniques/${id}/`,
-    CATEGORIES: '/api/techniques/categories/',
+    LIST: '/api/v1/techniques/',
+    DETAIL: (id: number) => `/api/v1/techniques/${id}/`,
+    CATEGORIES: '/api/v1/techniques/categories/',
   },
 
-  // Learning
+  // Learning — /api/v1/
   LEARNING: {
-    TECHNIQUE_NOTES: '/api/learning/technique-notes/',
-    TECHNIQUE_NOTE_DETAIL: (id: number) => `/api/learning/technique-notes/${id}/`,
-    SPARRING_NOTES: '/api/learning/sparring-notes/',
-    SPARRING_NOTE_DETAIL: (id: number) => `/api/learning/sparring-notes/${id}/`,
-    VIDEO_LIBRARY: '/api/learning/videos/',
+    TECHNIQUE_NOTES: '/api/v1/learning/technique-notes/',
+    TECHNIQUE_NOTE_DETAIL: (id: number) => `/api/v1/learning/technique-notes/${id}/`,
+    SPARRING_NOTES: '/api/v1/learning/sparring-notes/',
+    SPARRING_NOTE_DETAIL: (id: number) => `/api/v1/learning/sparring-notes/${id}/`,
+    VIDEO_LIBRARY: '/api/v1/learning/videos/',
   },
 
-  // Community
+  // Community — /api/v1/
   COMMUNITY: {
-    ACHIEVEMENTS: '/api/community/achievements/',
-    MY_ACHIEVEMENTS: '/api/community/achievements/mine/',
-    OPEN_MAT_SESSIONS: '/api/community/open-mat/',
-    OPEN_MAT_DETAIL: (id: number) => `/api/community/open-mat/${id}/`,
-    OPEN_MAT_JOIN: (id: number) => `/api/community/open-mat/${id}/join/`,
+    ACHIEVEMENTS: '/api/v1/community/achievements/',
+    MY_ACHIEVEMENTS: '/api/v1/community/achievements/mine/',
+    OPEN_MAT_SESSIONS: '/api/v1/community/open-mat/',
+    OPEN_MAT_DETAIL: (id: number) => `/api/v1/community/open-mat/${id}/`,
+    OPEN_MAT_JOIN: (id: number) => `/api/v1/community/open-mat/${id}/join/`,
   },
 } as const;
