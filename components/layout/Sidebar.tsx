@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
+  BarChart2,
   BookOpen,
   CalendarDays,
   CreditCard,
@@ -12,6 +13,7 @@ import {
   Shield,
   Swords,
   Timer,
+  Trophy,
   Users,
   Zap,
 } from 'lucide-react';
@@ -23,6 +25,8 @@ const NAV_ITEMS = [
   { href: '/athletes', label: 'Atletas', icon: Users },
   { href: '/classes', label: 'Clases', icon: CalendarDays },
   { href: '/matches', label: 'Combates', icon: Swords },
+  { href: '/competitions', label: 'Competiciones', icon: Trophy },
+  { href: '/stats', label: 'Estadísticas', icon: BarChart2 },
   { href: '/tatami', label: 'Tatami', icon: Timer },
   { href: '/membership', label: 'Membresías', icon: CreditCard },
   { href: '/learning', label: 'Aprendizaje', icon: BookOpen },
