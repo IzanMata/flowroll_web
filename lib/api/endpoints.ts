@@ -102,6 +102,29 @@ export const ENDPOINTS = {
     VIDEO_LIBRARY: '/api/v1/learning/videos/',
   },
 
+  // Competitions — /api/v1/
+  COMPETITIONS: {
+    TOURNAMENTS: '/api/v1/competitions/tournaments/',
+    TOURNAMENT_DETAIL: (id: number) => `/api/v1/competitions/tournaments/${id}/`,
+    TOURNAMENT_OPEN: (id: number) => `/api/v1/competitions/tournaments/${id}/open/`,
+    TOURNAMENT_REGISTER: (id: number) => `/api/v1/competitions/tournaments/${id}/register/`,
+    TOURNAMENT_GENERATE_BRACKET: (id: number) => `/api/v1/competitions/tournaments/${id}/generate_bracket/`,
+    TOURNAMENT_BRACKET: (id: number) => `/api/v1/competitions/tournaments/${id}/bracket/`,
+    TOURNAMENT_PARTICIPANTS: (id: number) => `/api/v1/competitions/tournaments/${id}/participants/`,
+    TOURNAMENT_COMPLETE: (id: number) => `/api/v1/competitions/tournaments/${id}/complete/`,
+    MATCH_RESULT: (id: number) => `/api/v1/competitions/matches/${id}/result/`,
+    DIVISIONS: '/api/v1/competitions/divisions/',
+    DIVISION_DETAIL: (id: number) => `/api/v1/competitions/divisions/${id}/`,
+  },
+
+  // Stats — /api/v1/
+  STATS: {
+    LIST: '/api/v1/stats/',
+    ATHLETE: (id: number) => `/api/v1/stats/athlete/${id}/`,
+    ATHLETE_RECOMPUTE: (id: number) => `/api/v1/stats/athlete/${id}/recompute/`,
+    LEADERBOARD: '/api/v1/stats/leaderboard/',
+  },
+
   // Community — /api/v1/
   COMMUNITY: {
     ACHIEVEMENTS: '/api/v1/community/achievements/',

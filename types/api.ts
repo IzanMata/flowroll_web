@@ -477,6 +477,103 @@ export interface OpenMatSession {
   is_public: boolean;
 }
 
+// ── Competitions ──────────────────────────────────────────────────────────────
+
+export type TournamentStatus = 'DRAFT' | 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+export type TournamentFormat = 'SINGLE_ELIMINATION' | 'DOUBLE_ELIMINATION' | 'ROUND_ROBIN';
+export type ParticipantStatus = 'REGISTERED' | 'WITHDRAWN';
+
+export interface Tournament {
+  id: number;
+  academy: number;
+  name: string;
+  description?: string;
+  date: string;
+  location?: string;
+  format: TournamentFormat;
+  status: TournamentStatus;
+  max_participants?: number | null;
+  created_at: string;
+}
+
+export interface TournamentRequest {
+  name: string;
+  description?: string;
+  date: string;
+  location?: string;
+  format: TournamentFormat;
+  max_participants?: number;
+}
+
+export interface TournamentDivision {
+  id: number;
+  tournament: number;
+  name: string;
+  belt_min?: BeltColor | null;
+  belt_max?: BeltColor | null;
+  weight_min?: number | null;
+  weight_max?: number | null;
+}
+
+export interface TournamentDivisionRequest {
+  name: string;
+  belt_min?: BeltColor;
+  belt_max?: BeltColor;
+  weight_min?: number;
+  weight_max?: number;
+}
+
+export interface TournamentParticipant {
+  id: number;
+  tournament: number;
+  athlete: AthleteProfile;
+  division?: TournamentDivision | null;
+  status: ParticipantStatus;
+  seed?: number | null;
+  registered_at: string;
+}
+
+export interface RegisterParticipantRequest {
+  athlete_id: number;
+  division_id?: number;
+}
+
+export interface TournamentMatch {
+  id: number;
+  tournament: number;
+  division?: TournamentDivision | null;
+  round_number: number;
+  participant_a?: TournamentParticipant | null;
+  participant_b?: TournamentParticipant | null;
+  winner?: TournamentParticipant | null;
+  score_a?: number | null;
+  score_b?: number | null;
+  notes?: string;
+  is_finished: boolean;
+}
+
+export interface MatchResultRequest {
+  winner_id: number;
+  score_a: number;
+  score_b: number;
+  notes?: string;
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+
+export interface AthleteMatchStats {
+  id: number;
+  athlete: AthleteProfile;
+  total_matches: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  win_rate: number; // 0.0–1.0
+  total_points_scored: number;
+  total_points_conceded: number;
+  submissions_won: number;
+}
+
 // Paginated response wrapper
 export interface PaginatedResponse<T> {
   count: number;
