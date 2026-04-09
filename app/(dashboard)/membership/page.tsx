@@ -14,6 +14,10 @@ import {
 import { useAcademyId } from '@/hooks/useAcademy';
 import apiClient from '@/lib/api/client';
 import { ENDPOINTS } from '@/lib/api/endpoints';
+import {
+  createCheckout,
+  createSeminarCheckout,
+} from '@/features/payments/api/fetchPayments';
 import type {
   MembershipPlan,
   PaginatedResponse,
@@ -237,8 +241,11 @@ function PlanCard({
   const academyId = useAcademyId();
   const queryClient = useQueryClient();
   const [enrolled, setEnrolled] = useState(false);
-  const [enrollError, setEnrollError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
+  const isFree = parseFloat(plan.price) === 0;
+
+  // Free plan → direct enrollment (no payment)
   const enrollMutation = useMutation({
     mutationFn: async () => {
       await apiClient.post(ENDPOINTS.MEMBERSHIP.ENROLL, {
@@ -248,7 +255,7 @@ function PlanCard({
     },
     onSuccess: () => {
       setEnrolled(true);
-      setEnrollError(null);
+      setActionError(null);
       queryClient.invalidateQueries({
         queryKey: ['membership', 'subscriptions', academyId],
       });
@@ -259,13 +266,32 @@ function PlanCard({
         const data = axiosErr.response?.data;
         if (data) {
           const first = Object.values(data)[0];
-          setEnrollError(Array.isArray(first) ? String(first[0]) : String(first));
+          setActionError(Array.isArray(first) ? String(first[0]) : String(first));
           return;
         }
       }
-      setEnrollError('No se pudo procesar la inscripción.');
+      setActionError('No se pudo procesar la inscripción.');
     },
   });
+
+  // Paid plan → Stripe Checkout redirect
+  const checkoutMutation = useMutation({
+    mutationFn: () =>
+      createCheckout({
+        plan_id: plan.id,
+        academy: academyId!,
+        success_url: `${window.location.origin}/payments/success`,
+        cancel_url: `${window.location.origin}/payments/cancel`,
+      }),
+    onSuccess: ({ checkout_url }) => {
+      window.location.href = checkout_url;
+    },
+    onError: () => {
+      setActionError('No se pudo iniciar el pago. Inténtalo de nuevo.');
+    },
+  });
+
+  const isPending = enrollMutation.isPending || checkoutMutation.isPending;
 
   return (
     <Card className="flex flex-col transition-all duration-200 hover:border-white/[0.1]">
@@ -277,14 +303,18 @@ function PlanCard({
       <CardContent className="flex flex-col flex-1 gap-3 px-5 pb-5">
         <div>
           <span className="text-2xl font-bold tabular-nums text-foreground">
-            {parseFloat(plan.price).toLocaleString('es-ES', {
-              style: 'currency',
-              currency: 'EUR',
-            })}
+            {isFree
+              ? 'Gratis'
+              : parseFloat(plan.price).toLocaleString('es-ES', {
+                  style: 'currency',
+                  currency: 'EUR',
+                })}
           </span>
-          <span className="ml-1 text-xs text-muted-foreground">
-            / {PERIOD_LABELS[plan.billing_period]}
-          </span>
+          {!isFree && (
+            <span className="ml-1 text-xs text-muted-foreground">
+              / {PERIOD_LABELS[plan.billing_period]}
+            </span>
+          )}
         </div>
 
         {plan.description && (
@@ -305,8 +335,8 @@ function PlanCard({
         )}
 
         <div className="mt-auto space-y-2">
-          {enrollError && (
-            <p className="text-xs text-red-400">{enrollError}</p>
+          {actionError && (
+            <p className="text-xs text-red-400">{actionError}</p>
           )}
           {enrolled ? (
             <div className="flex items-center gap-2 text-sm text-emerald-400">
@@ -317,18 +347,29 @@ function PlanCard({
             <Button
               className="w-full"
               size="sm"
-              onClick={() => enrollMutation.mutate()}
-              disabled={hasActiveSubscription || enrollMutation.isPending}
+              onClick={() =>
+                isFree ? enrollMutation.mutate() : checkoutMutation.mutate()
+              }
+              disabled={hasActiveSubscription || isPending}
             >
-              {enrollMutation.isPending ? (
+              {isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Procesando…
+                  {isFree ? 'Procesando…' : 'Redirigiendo…'}
                 </>
               ) : hasActiveSubscription ? (
                 'Ya tienes una suscripción activa'
-              ) : (
+              ) : isFree ? (
                 'Inscribirse'
+              ) : (
+                <>
+                  <CreditCard className="h-4 w-4" />
+                  Pagar{' '}
+                  {parseFloat(plan.price).toLocaleString('es-ES', {
+                    style: 'currency',
+                    currency: 'EUR',
+                  })}
+                </>
               )}
             </Button>
           )}
@@ -353,7 +394,9 @@ function SeminarCard({
   const [registered, setRegistered] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isFull = seminar.registered_count >= seminar.capacity;
+  const isFree = parseFloat(seminar.price) === 0;
 
+  // Free seminar → direct registration
   const registerMutation = useMutation({
     mutationFn: async () => {
       await apiClient.post(ENDPOINTS.MEMBERSHIP.SEMINAR_REGISTER(seminar.id));
@@ -365,6 +408,22 @@ function SeminarCard({
     },
     onError: () => setError('No se pudo registrar en el seminario.'),
   });
+
+  // Paid seminar → Stripe Checkout redirect
+  const checkoutMutation = useMutation({
+    mutationFn: () =>
+      createSeminarCheckout({
+        seminar_id: seminar.id,
+        success_url: `${window.location.origin}/payments/success`,
+        cancel_url: `${window.location.origin}/payments/cancel`,
+      }),
+    onSuccess: ({ checkout_url }) => {
+      window.location.href = checkout_url;
+    },
+    onError: () => setError('No se pudo iniciar el pago. Inténtalo de nuevo.'),
+  });
+
+  const isPending = registerMutation.isPending || checkoutMutation.isPending;
 
   return (
     <div className="rounded-xl border border-white/[0.06] bg-card px-4 py-3.5 transition-all duration-200 hover:border-white/[0.1]">
@@ -383,10 +442,12 @@ function SeminarCard({
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">
           <span className="text-sm font-bold tabular-nums text-foreground">
-            {parseFloat(seminar.price).toLocaleString('es-ES', {
-              style: 'currency',
-              currency: 'EUR',
-            })}
+            {isFree
+              ? 'Gratis'
+              : parseFloat(seminar.price).toLocaleString('es-ES', {
+                  style: 'currency',
+                  currency: 'EUR',
+                })}
           </span>
           <span
             className={cn(
@@ -402,18 +463,25 @@ function SeminarCard({
             <Button
               size="sm"
               variant="outline"
-              disabled={isFull || registerMutation.isPending}
-              onClick={() => registerMutation.mutate()}
+              disabled={isFull || isPending}
+              onClick={() =>
+                isFree ? registerMutation.mutate() : checkoutMutation.mutate()
+              }
               className="h-7 text-xs"
             >
-              {registerMutation.isPending ? (
+              {isPending ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
               ) : isFull ? (
                 'Completo'
-              ) : (
+              ) : isFree ? (
                 <>
                   <CalendarCheck className="h-3 w-3" />
                   Registrarme
+                </>
+              ) : (
+                <>
+                  <CreditCard className="h-3 w-3" />
+                  Pagar y registrarme
                 </>
               )}
             </Button>

@@ -587,3 +587,62 @@ export interface ApiError {
   detail?: string;
   [field: string]: string | string[] | undefined;
 }
+
+// ── Payments (Stripe Connect marketplace) ─────────────────────────────────────
+
+export type PaymentStatus = 'PENDING' | 'SUCCEEDED' | 'FAILED' | 'REFUNDED';
+export type PaymentType = 'SUBSCRIPTION' | 'SEMINAR' | 'DROP_IN';
+
+export interface Payment {
+  id: number;
+  athlete: number;
+  academy: number;
+  payment_type: PaymentType;
+  amount: string;               // decimal as string, e.g. "50.00"
+  currency: string;             // e.g. "eur"
+  status: PaymentStatus;
+  stripe_payment_intent?: string | null;
+  stripe_invoice_url?: string | null;
+  description?: string | null;
+  subscription?: number | null;
+  seminar?: number | null;
+  created_at: string;
+}
+
+export interface CheckoutRequest {
+  plan_id: number;
+  academy: number;
+  success_url?: string;
+  cancel_url?: string;
+}
+
+export interface SeminarCheckoutRequest {
+  seminar_id: number;
+  success_url?: string;
+  cancel_url?: string;
+}
+
+export interface CheckoutResponse {
+  checkout_url: string;
+  session_id?: string;
+}
+
+export interface ConnectStatus {
+  has_stripe_account: boolean;
+  charges_enabled: boolean;
+  details_submitted: boolean;
+  payouts_enabled: boolean;
+  stripe_account_id?: string | null;
+}
+
+export interface AcademyOnboardingRequest {
+  academy: number;
+}
+
+export interface OnboardingResponse {
+  onboarding_url: string;
+}
+
+export interface DashboardResponse {
+  dashboard_url: string;
+}
