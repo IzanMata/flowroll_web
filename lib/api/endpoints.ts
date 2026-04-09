@@ -125,6 +125,18 @@ export const ENDPOINTS = {
     LEADERBOARD: '/api/v1/stats/leaderboard/',
   },
 
+  // Payments (Stripe Connect marketplace) — /api/v1/
+  PAYMENTS: {
+    ACADEMY_ONBOARDING: '/api/v1/payments/academy-onboarding/',
+    CONNECT_STATUS: (academyId: number) =>
+      `/api/v1/payments/academy/${academyId}/connect-status/`,
+    ACADEMY_DASHBOARD: (academyId: number) =>
+      `/api/v1/payments/academy/${academyId}/dashboard/`,
+    CHECKOUT: '/api/v1/payments/checkout/',
+    SEMINAR_CHECKOUT: '/api/v1/payments/seminar-checkout/',
+    HISTORY: '/api/v1/payments/history/',
+  },
+
   // Community — /api/v1/
   COMMUNITY: {
     ACHIEVEMENTS: '/api/v1/community/achievements/',
